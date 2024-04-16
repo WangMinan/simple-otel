@@ -10,6 +10,10 @@ namespace trace
 
     void OstreamExporter::Export()
     {
+        if (span->IsNoop())
+        {
+            return;
+        }
         sout << "{"
              << "\n  \"trace_id\": \"" << span->TraceId() << "\","
              << "\n  \"span_id\": \"" << span->Id() << "\","

@@ -25,4 +25,8 @@ namespace trace
         this->spans.emplace_back(span);
         return std::make_shared<Span>(span);
     }
+
+    std::shared_ptr<Span> NoopTrace::StartSpan(std::string name, std::string service_name, SpanContext &span_context) {
+        return std::make_shared<NoopSpan>();
+    }
 } // namespace trace

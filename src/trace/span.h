@@ -40,6 +40,12 @@ namespace trace
         long EndTime() { return this->end_time; };
         std::unordered_map<std::string, std::string> Tags() { return this->tags; };
         StatusCode Status() { return this->status; };
+        virtual bool IsNoop() { return false; };
+    };
+
+    class NoopSpan : public Span
+    {
+        bool IsNoop() override { return true; }
     };
 
 } // namespace trace

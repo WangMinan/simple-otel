@@ -29,4 +29,8 @@ namespace trace
     {
         return span_context;
     }
+
+    TraceFlag Context::GetTraceFlag() {
+        return span_context.GetTraceFlag();
+    }
 }

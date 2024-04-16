@@ -23,10 +23,20 @@ namespace trace
             trace_id = utils::IdGenerator::GenerateId();
         }
         Trace(std::string trace_id_) : trace_id(trace_id_){};
-        ~Trace(){};
-        std::shared_ptr<Span> StartSpan(std::string name, std::string service_name, SpanContext &span_context);
+        virtual ~Trace(){};
+        virtual std::shared_ptr<Span> StartSpan(std::string name, std::string service_name, SpanContext &span_context);
         std::string Id() { return this->trace_id; }
     };
+
+    class NoopTrace : public Trace
+    {
+    public:
+        NoopTrace() {};
+        ~NoopTrace() = default;
+        std::shared_ptr<Span> StartSpan(std::string name, std::string service_name, SpanContext &span_context) override;
+    };
+    
+    
 
 } // namespace trace
 #endif

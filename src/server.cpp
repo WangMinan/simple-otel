@@ -8,6 +8,7 @@
 #include "protocol/message.h"
 #include "trace/trace.h"
 #include "span_exporter.h"
+#include "trace_provider.h"
 
 int main(int argc, char const *argv[])
 {
@@ -29,10 +30,9 @@ int main(int argc, char const *argv[])
         int len = recv(clientSocket, buf, sizeof(buf), 0);
         std::string str(buf);
         protocol::Message msg = protocol::Message::Deserialize(str);
-        std::string trace_id = msg.GetHeader("trace_id");
-        trace::Trace trace(trace_id);
-        trace::SpanContext parent_context(trace_id, msg.GetHeader("span_id"));
-        auto span = trace.StartSpan("server", "server", parent_context);
+        trace::Context::Extract(msg);
+        auto tracer = trace::TraceProvider::GetTrace(trace::Context::GetTraceId());
+        auto span = tracer->StartSpan("server", "server", trace::Context::GetSpanContext());
 
         write(clientSocket, buf, len);
 

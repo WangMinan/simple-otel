@@ -11,10 +11,10 @@ namespace trace
     {
     private:
         std::unordered_map<std::string, trace::Trace> traces;
-        ~TraceProvider() = default;
         TraceProvider() = default;
 
     public:
+        ~TraceProvider() = default;
         static TraceProvider &GetInstance();
         static std::shared_ptr<Trace> GetTrace();
         static std::shared_ptr<Trace> GetTrace(std::string trace_id);

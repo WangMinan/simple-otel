@@ -2,6 +2,8 @@
 // socket programming
 #include "protocol/message.h"
 #include "span_context.h"
+#include "span_exporter.h"
+#include "span_metadata.h"
 #include "trace.h"
 #include <cstring>
 #include <iostream>
@@ -41,6 +43,10 @@ int main()
     
     // closing socket
     close(clientSocket);
+    span->SetStatus(trace::StatusCode::kOk);
+    span->End();
+    trace::OstreamExporter exporter(span);
+    exporter.Export();
 
     return 0;
 }

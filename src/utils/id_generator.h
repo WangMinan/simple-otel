@@ -7,6 +7,7 @@ namespace utils
     class IdGenerator
     {
     public:
+        // TODO: 这个算法会出现重复id，仅测试用
         std::string static GenerateId(int length = 16)
         {
             const std::string chars =

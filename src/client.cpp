@@ -9,6 +9,7 @@
 #include <string>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "trace_provider.h"
 
 int main()
 {
@@ -27,10 +28,10 @@ int main()
 
     // sending data
     protocol::Message msg;
-    trace::Trace trace;
+    auto trace = trace::TraceProvider::GetTrace();
     trace::SpanContext context;
-    auto span = trace.StartSpan("client", "client", context);
-    msg.SetHeader("trace_id", trace.Id());
+    auto span = trace->StartSpan("client", "client", context);
+    msg.SetHeader("trace_id", trace->Id());
     msg.SetHeader("span_id", span->Id());
     std::string message = msg.Serialize().c_str();
 

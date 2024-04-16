@@ -1,3 +1,5 @@
+#ifndef TRACE_SPAN_METADATA_H
+#define TRACE_SPAN_METADATA_H
 
 namespace trace
 {
@@ -12,3 +14,4 @@ namespace trace
         kError = 2
     };
 } // namespace trace
+#endif // !TRACE_SPAN_METADATA_H

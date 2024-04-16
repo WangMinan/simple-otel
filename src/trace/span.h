@@ -1,4 +1,5 @@
-
+#ifndef TRACE_SPAN_H
+#define TRACE_SPAN_H
 #include <string>
 #include <unordered_map>
 #include "endpoint.h"
@@ -30,7 +31,17 @@ namespace trace
         void SetTag(std::string key, std::string value);
         void End();
         void SetStatus(StatusCode status);
-        std::string Id();
+        std::string Id() { return this->id; };
+        std::string TraceId() { return this->trace_id; };
+        std::string ParentId() { return this->parent_id; };
+        std::string Name() { return this->name; };
+        std::string ServiceName() { return this->service_name; };
+        long StartTime() { return this->start_time; };
+        long EndTime() { return this->end_time; };
+        std::unordered_map<std::string, std::string> Tags() { return this->tags; };
+        StatusCode Status() { return this->status; };
     };
 
 } // namespace trace
+
+#endif

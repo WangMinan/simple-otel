@@ -1,4 +1,7 @@
 
+#ifndef TRACE_ENDPOINT_H
+#define TRACE_ENDPOINT_H
+
 #include <string>
 namespace trace
 {
@@ -16,3 +19,5 @@ namespace trace
     };
 
 } // namespace trace
+
+#endif

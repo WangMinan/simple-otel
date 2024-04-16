@@ -1,3 +1,5 @@
+#ifndef TRACE_TRACE_H
+#define TRACE_TRACE_H
 #include "../utils/id_generator.h"
 #include "span_context.h"
 #include "span.h"
@@ -22,7 +24,9 @@ namespace trace
         }
         Trace(std::string trace_id_) : trace_id(trace_id_){};
         ~Trace(){};
-        std::shared_ptr<Span> StartSpan(std::string name, std::string service_name, SpanContext& span_context);
+        std::shared_ptr<Span> StartSpan(std::string name, std::string service_name, SpanContext &span_context);
+        std::string Id() { return this->trace_id; }
     };
 
 } // namespace trace
+#endif

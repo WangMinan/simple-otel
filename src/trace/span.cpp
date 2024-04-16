@@ -37,7 +37,4 @@ namespace trace
         this->status = status;
     }
 
-    std::string Span::Id() {
-        return this->id;
-    }
 }

@@ -1,4 +1,5 @@
-
+#ifndef TRACE_SPAN_CONTEXT_H
+#define TRACE_SPAN_CONTEXT_H
 #include <string>
 namespace trace
 {
@@ -24,3 +25,5 @@ namespace trace
     };
 
 } // namespace trace
+
+#endif // !TRACE_SPAN_CONTEXT_H

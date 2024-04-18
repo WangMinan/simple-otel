@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
         std::string str(buf);
         protocol::Message msg = protocol::Message::Deserialize(str);
         trace::Context::Extract(msg);
-        auto tracer = trace::TraceProvider::GetTrace(trace::Context::GetTraceId());
+        auto tracer = trace::TraceProvider::GetTrace();
         auto span = tracer->StartSpan("server", "server", trace::Context::GetSpanContext());
 
         write(clientSocket, buf, len);

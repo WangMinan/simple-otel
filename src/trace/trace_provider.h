@@ -16,6 +16,7 @@ namespace trace
     public:
         ~TraceProvider() = default;
         static TraceProvider &GetInstance();
+        static std::shared_ptr<Trace> StartTrace();
         static std::shared_ptr<Trace> GetTrace();
         static std::shared_ptr<Trace> GetTrace(std::string trace_id);
     };

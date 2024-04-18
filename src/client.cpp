@@ -30,17 +30,18 @@ int main()
 
     // sending data
     protocol::Message msg;
-    auto trace = trace::TraceProvider::GetTrace();
+    auto trace = trace::TraceProvider::StartTrace();
     trace::SpanContext context;
     auto span = trace->StartSpan("client", "client", context);
     msg.SetHeader("trace_id", trace->Id());
     msg.SetHeader("span_id", span->Id());
+    msg.SetHeader("trace_flag", std::to_string(static_cast<int>(TraceFlag::kIsDiscarded)));
     std::string message = msg.Serialize().c_str();
 
     send(clientSocket, message.c_str(), strlen(message.c_str()), 0);
     char buffer[1024];
     recv(clientSocket, buffer, sizeof(buffer), 0);
-    
+
     // closing socket
     close(clientSocket);
     span->SetStatus(trace::StatusCode::kOk);

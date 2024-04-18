@@ -26,6 +26,7 @@ namespace trace
         bool has_ended_;
 
     public:
+        Span() = default;
         Span(std::string name, std::string service_name, std::string trace_id, std::string parent_id);
         ~Span();
         void SetTag(std::string key, std::string value);

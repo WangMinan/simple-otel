@@ -39,7 +39,7 @@ namespace protocol
         // 读取头部字符串
         char headers_str[headers_length];
         iss.read(headers_str, headers_length);
-        
+
         iss.ignore(2); // 忽略 "\r\n"
         // 反序列化头部
         auto headers = deserialize_headers(headers_str);
@@ -48,15 +48,22 @@ namespace protocol
         return msg;
     }
 
-    void Message::SetHeader(std::string key, std::string value) {
+    void Message::SetHeader(std::string key, std::string value)
+    {
         this->headers[key] = value;
     }
 
-    void Message::RemoveHeader(std::string key) {
+    void Message::RemoveHeader(std::string key)
+    {
         this->headers.erase(key);
     }
 
-    std::string Message::GetHeader(std::string key) {
+    std::string Message::GetHeader(std::string key)
+    {
+        if (this->headers.find(key) == this->headers.end())
+        {
+            return "";
+        }
         return this->headers[key];
     }
 } // namespace protocol

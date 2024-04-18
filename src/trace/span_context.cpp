@@ -8,11 +8,20 @@ namespace trace
         return !trace_id.empty() && !span_id.empty();
     }
 
-
     void Context::Extract(protocol::Message message)
     {
+        auto trace_id = message.GetHeader("trace_id");
+        auto span_id = message.GetHeader("span_id");
+        auto trace_flag = message.GetHeader("trace_flag");
+        if (trace_flag.empty())
+        {
 
-        span_context = SpanContext(message.GetHeader("trace-id"), message.GetHeader("span-id"));
+            span_context = SpanContext(trace_id, span_id);
+        }
+        else
+        {
+            span_context = SpanContext(trace_id, span_id, TraceFlagHandler::GetTraceFlag(trace_flag));
+        }
     }
 
     std::string Context::GetTraceId()
@@ -30,7 +39,8 @@ namespace trace
         return span_context;
     }
 
-    TraceFlag Context::GetTraceFlag() {
+    TraceFlag Context::GetTraceFlag()
+    {
         return span_context.GetTraceFlag();
     }
 }

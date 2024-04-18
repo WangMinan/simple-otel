@@ -1,6 +1,8 @@
 
 #include "trace_provider.h"
 #include <memory>
+#include <string>
+#include <stdexcept>
 
 namespace trace
 {
@@ -10,33 +12,48 @@ namespace trace
         return provider;
     }
 
-    /// @brief create a trace and return it
+    /// @brief create a trace by context and return it
     /// @return trace
     std::shared_ptr<Trace> TraceProvider::GetTrace()
     {
-        if (Context::GetTraceFlag() == kIsDiscarded) {
+        if (Context::GetTraceFlag() == kIsDiscarded)
+        {
             return std::make_shared<NoopTrace>();
         }
         TraceProvider &provider = TraceProvider::GetInstance();
-        auto trace = std::make_shared<Trace>();
+        std::string trace_id = Context::GetTraceId();
+        if (trace_id.empty())
+        {
+            throw std::runtime_error("trace id is empty");
+        }
+        auto trace = std::make_shared<Trace>(trace_id);
         provider.traces[trace->Id()] = *trace;
         return trace;
     }
 
-    /// @brief get a trace by its id. If not exist, this function will create it.
-    /// @param trace_id 
-    /// @return trace 
+    /// @brief get a trace by its id. If not exist, this function will throw an error.
+    /// @param trace_id
+    /// @return trace
     std::shared_ptr<Trace> TraceProvider::GetTrace(std::string trace_id)
     {
-        if (Context::GetTraceFlag() == kIsDiscarded) {
+        if (Context::GetTraceFlag() == kIsDiscarded)
+        {
             return std::make_shared<NoopTrace>();
         }
         TraceProvider &provider = TraceProvider::GetInstance();
         if (provider.traces.find(trace_id) == provider.traces.end())
         {
-            provider.traces[trace_id] = Trace(trace_id);
+            throw std::runtime_error("trace not found");
         }
         return std::make_shared<Trace>(provider.traces[trace_id]);
     }
 
+    /// @brief start a new trace. This function should be invoked at the beginning.
+    /// @return trace
+    std::shared_ptr<Trace> TraceProvider::StartTrace() {
+        auto trace = std::make_shared<Trace>();
+        TraceProvider &provider = TraceProvider::GetInstance();
+        provider.traces[trace->Id()] = *trace;
+        return trace;
+    }
 } // namespace trace

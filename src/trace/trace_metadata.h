@@ -1,6 +1,8 @@
 
 #ifndef TRACE_TRACE_FLAG_H
 #define TRACE_TRACE_FLAG_H
+#include <cstdlib>
+#include <string>
 enum TraceFlag
 {
     // 确定采样
@@ -13,4 +15,26 @@ enum TraceFlag
     // 确定丢弃
     kIsDiscarded = 3
 };
+
+class TraceFlagHandler
+{
+public:
+    static TraceFlag GetTraceFlag(std::string trace_flag)
+    {
+        switch (atoi(trace_flag.c_str()))
+        {
+        case 0:
+            return TraceFlag::kIsSampled;
+        case 1:
+            return TraceFlag::kIsRandom;
+        case 2:
+            return TraceFlag::kIsWaiting;
+        case 3:
+            return TraceFlag::kIsDiscarded;
+        default:
+            return TraceFlag::kIsSampled;
+        }
+    };
+};
+
 #endif // !TRACE_TRACE_FLAG_H

@@ -3,12 +3,22 @@
 #include <memory>
 #include <string>
 #include <stdexcept>
+#include "trace_metadata.h"
+#include "span_context.h"
 
 namespace trace
 {
+    std::mutex trace::TraceProvider::lock;
+    trace::TraceProvider TraceProvider::provider;
+    void TraceProvider::SetSpanProcessor(std::shared_ptr<SpanProcessor> processor)
+    {
+        std::lock_guard<std::mutex> lock_guard(TraceProvider::lock);
+        provider = TraceProvider(processor);
+    }
+
     TraceProvider &TraceProvider::GetInstance()
     {
-        static TraceProvider provider;
+        std::lock_guard<std::mutex> lock_guard(TraceProvider::lock);
         return provider;
     }
 
@@ -26,8 +36,8 @@ namespace trace
         {
             throw std::runtime_error("trace id is empty");
         }
-        auto trace = std::make_shared<Trace>(trace_id);
-        provider.traces[trace->Id()] = *trace;
+        auto trace = std::make_shared<Trace>(trace_id, provider.processor);
+        provider.traces[trace->Id()] = trace;
         return trace;
     }
 
@@ -45,15 +55,16 @@ namespace trace
         {
             throw std::runtime_error("trace not found");
         }
-        return std::make_shared<Trace>(provider.traces[trace_id]);
+        return provider.traces[trace_id];
     }
 
     /// @brief start a new trace. This function should be invoked at the beginning.
     /// @return trace
-    std::shared_ptr<Trace> TraceProvider::StartTrace() {
-        auto trace = std::make_shared<Trace>();
-        TraceProvider &provider = TraceProvider::GetInstance();
-        provider.traces[trace->Id()] = *trace;
+    std::shared_ptr<Trace> TraceProvider::StartTrace()
+    {
+        auto provider = GetInstance();
+        auto trace = std::make_shared<Trace>(provider.processor);
+        provider.traces[trace->Id()] = trace;
         return trace;
     }
 } // namespace trace

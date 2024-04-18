@@ -1,9 +1,10 @@
-#ifndef TRACE_SPAN_H
-#define TRACE_SPAN_H
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include "endpoint.h"
 #include "span_metadata.h"
+#include "span_processor.h"
+#ifndef TRACE_SPAN_H
+#define TRACE_SPAN_H
 namespace trace
 {
     class Span
@@ -24,10 +25,11 @@ namespace trace
         std::unordered_map<std::string, std::string> tags;
         StatusCode status;
         bool has_ended_;
+        std::shared_ptr<SpanProcessor> processor;
 
     public:
         Span() = default;
-        Span(std::string name, std::string service_name, std::string trace_id, std::string parent_id);
+        Span(std::string name, std::string service_name, std::string trace_id, std::string parent_id, std::shared_ptr<SpanProcessor> processor_);
         ~Span();
         void SetTag(std::string key, std::string value);
         void End();

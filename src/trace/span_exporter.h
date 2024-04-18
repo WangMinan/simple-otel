@@ -1,23 +1,19 @@
 
 #ifndef TRACE_SPAN_EXPORTER_H
 #define TRACE_SPAN_EXPORTER_H
-#include "span.h"
-#include <memory>
-#include <iostream>
 
 namespace trace
 {
-    class OstreamExporter
+    class Span;
+    class SpanExporter
     {
-    private:
-        std::shared_ptr<Span> span;
-        std::ostream &sout;
+    protected:
+        virtual void Export_(Span &span) = 0;
 
     public:
-        OstreamExporter(std::shared_ptr<Span> span_, std::ostream &sout_ = std::cout) : span(span_), sout(sout_){};
-        ~OstreamExporter() = default;
-        void Export();
+        virtual ~SpanExporter() = default;
+        virtual void Export(Span &span) final;
     };
 
-} // namespace trace
+};     // namespace trace
 #endif // !TRACE_SPAN_EXPORTER_H

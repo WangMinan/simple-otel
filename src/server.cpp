@@ -9,9 +9,14 @@
 #include "trace/trace.h"
 #include "span_exporter.h"
 #include "trace_provider.h"
+#include "span_context.h"
+#include "ostream_exporter.h"
+
+void initTrace();
 
 int main(int argc, char const *argv[])
 {
+    initTrace();
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     sockaddr_in addr;
     addr.sin_family = AF_INET;
@@ -32,17 +37,22 @@ int main(int argc, char const *argv[])
         protocol::Message msg = protocol::Message::Deserialize(str);
         trace::Context::Extract(msg);
         auto tracer = trace::TraceProvider::GetTrace();
-        auto span = tracer->StartSpan("server", "server", trace::Context::GetSpanContext());
+        auto span = tracer->StartSpan("server", "server");
 
         write(clientSocket, buf, len);
 
         span->SetStatus(trace::StatusCode::kOk);
         span->End();
         close(clientSocket);
-        trace::OstreamExporter exporter(span);
-        exporter.Export();
     }
 
     close(serverSocket);
     return 0;
+}
+
+void initTrace()
+{
+    auto exporter = std::make_unique<trace::OstreamSpanExporter>();
+    auto processor = std::make_shared<trace::SimpleSpanProcessor>(std::move(exporter));
+    trace::TraceProvider::SetSpanProcessor(processor);
 }

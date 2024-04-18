@@ -1,20 +1,22 @@
 // C++ program to illustrate the client application in the
 // socket programming
+#include "ostream_exporter.h"
 #include "protocol/message.h"
 #include "span_context.h"
-#include "span_exporter.h"
+#include "trace/ostream_exporter.h"
 #include "span_metadata.h"
-#include "trace.h"
 #include <cstring>
-#include <iostream>
+#include <memory>
 #include <netinet/in.h>
 #include <string>
 #include <sys/socket.h>
 #include <unistd.h>
 #include "trace_provider.h"
 
+void initTrace();
 int main()
 {
+    initTrace();
     // creating socket
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -32,10 +34,10 @@ int main()
     protocol::Message msg;
     auto trace = trace::TraceProvider::StartTrace();
     trace::SpanContext context;
-    auto span = trace->StartSpan("client", "client", context);
+    auto span = trace->StartSpan("client", "client");
     msg.SetHeader("trace_id", trace->Id());
     msg.SetHeader("span_id", span->Id());
-    msg.SetHeader("trace_flag", std::to_string(static_cast<int>(TraceFlag::kIsDiscarded)));
+    msg.SetHeader("trace_flag", std::to_string(static_cast<int>(TraceFlag::kIsSampled)));
     std::string message = msg.Serialize().c_str();
 
     send(clientSocket, message.c_str(), strlen(message.c_str()), 0);
@@ -46,8 +48,13 @@ int main()
     close(clientSocket);
     span->SetStatus(trace::StatusCode::kOk);
     span->End();
-    trace::OstreamExporter exporter(span);
-    exporter.Export();
 
     return 0;
+}
+
+void initTrace()
+{
+    auto exporter = std::make_unique<trace::OstreamSpanExporter>();
+    auto processor = std::make_shared<trace::SimpleSpanProcessor>(std::move(exporter));
+    trace::TraceProvider::SetSpanProcessor(processor);
 }

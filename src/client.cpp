@@ -32,12 +32,13 @@ int main()
 
     // sending data
     protocol::Message msg;
-    auto trace = trace::TraceProvider::StartTrace();
+    auto trace = trace::TraceProvider::GetTrace();
     trace::SpanContext context;
     auto span = trace->StartSpan("client", "client");
     msg.SetHeader("trace_id", trace->Id());
     msg.SetHeader("span_id", span->Id());
     msg.SetHeader("trace_flag", std::to_string(static_cast<int>(TraceFlag::kIsSampled)));
+    msg.SetHeader("sampler", trace->Context()->GetSampler().Serialize());
     std::string message = msg.Serialize().c_str();
 
     send(clientSocket, message.c_str(), strlen(message.c_str()), 0);
@@ -55,6 +56,6 @@ int main()
 void initTrace()
 {
     auto exporter = std::make_unique<trace::OstreamSpanExporter>();
-    auto processor = std::make_shared<trace::SimpleSpanProcessor>(std::move(exporter));
-    trace::TraceProvider::SetSpanProcessor(processor);
+    auto processor = std::make_unique<trace::SimpleSpanProcessor>(std::move(exporter));
+    trace::TraceProvider::InitProvider(std::move(processor));
 }

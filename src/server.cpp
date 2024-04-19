@@ -53,6 +53,6 @@ int main(int argc, char const *argv[])
 void initTrace()
 {
     auto exporter = std::make_unique<trace::OstreamSpanExporter>();
-    auto processor = std::make_shared<trace::SimpleSpanProcessor>(std::move(exporter));
-    trace::TraceProvider::SetSpanProcessor(processor);
+    auto processor = std::make_unique<trace::SimpleSpanProcessor>(std::move(exporter));
+    trace::TraceProvider::InitProvider(std::move(processor));
 }

@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include "span_metadata.h"
 #include "span_processor.h"
+#include "trace_context.h"
 #ifndef TRACE_SPAN_H
 #define TRACE_SPAN_H
 namespace trace
@@ -25,11 +26,13 @@ namespace trace
         std::unordered_map<std::string, std::string> tags;
         StatusCode status;
         bool has_ended_;
-        std::shared_ptr<SpanProcessor> processor;
+        std::shared_ptr<TraceContext> trace_context;
+
+    protected:
+        Span() = default;
 
     public:
-        Span() = default;
-        Span(std::string name, std::string service_name, std::string trace_id, std::string parent_id, std::shared_ptr<SpanProcessor> processor_);
+        Span(std::string name, std::string service_name, std::string trace_id, std::string parent_id, std::shared_ptr<TraceContext> trace_context_);
         ~Span();
         void SetTag(std::string key, std::string value);
         void End();
@@ -43,14 +46,14 @@ namespace trace
         long EndTime() { return this->end_time; };
         std::unordered_map<std::string, std::string> Tags() { return this->tags; };
         StatusCode Status() { return this->status; };
-        virtual bool IsNoop() { return false; };
     };
 
     class NoopSpan : public Span
     {
-        bool IsNoop() override { return true; }
+    public:
+        NoopSpan(){};
     };
 
-} // namespace trace
+}; // namespace trace
 
 #endif

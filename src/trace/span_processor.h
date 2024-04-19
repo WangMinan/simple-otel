@@ -16,6 +16,7 @@ namespace trace
         virtual ~SpanProcessor() = default;
         virtual void OnStart(Span &span) = 0;
         virtual void OnEnd(Span &span) = 0;
+        virtual std::unique_ptr<SpanProcessor> Clone() = 0;
     };
 
     class SimpleSpanProcessor : public SpanProcessor
@@ -25,6 +26,7 @@ namespace trace
         ~SimpleSpanProcessor() = default;
         void OnStart(Span &span) override;
         void OnEnd(Span &span) override;
+        std::unique_ptr<SpanProcessor> Clone() override;
     };
 }; // namespace trace
 

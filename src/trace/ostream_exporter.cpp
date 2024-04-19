@@ -1,6 +1,8 @@
 
 #include "ostream_exporter.h"
+#include <memory>
 #include <string>
+#include "span_exporter.h"
 #include "span_metadata.h"
 #include "span.h"
 namespace trace
@@ -8,7 +10,7 @@ namespace trace
     std::string printTags(Span &span);
     std::string printStatus(StatusCode status);
 
-    void OstreamSpanExporter::Export_(Span &span)
+    void OstreamSpanExporter::Export(Span &span)
     {
         sout << "{"
              << "\n  \"trace_id\": \"" << span.TraceId() << "\","
@@ -47,5 +49,10 @@ namespace trace
         default:
             return "Unknown";
         }
+    }
+
+    std::unique_ptr<SpanExporter> OstreamSpanExporter::Clone()
+    {
+        return std::make_unique<OstreamSpanExporter>();
     }
 } // namespace trace

@@ -3,30 +3,35 @@
 #define TRACE_TRACE_PROVIDER_H
 #include "span_processor.h"
 #include "trace.h"
+#include "trace_context.h"
+#include "span_context.h"
 #include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 namespace trace
 {
+    class AlwaysOnSampler;
     class TraceProvider
     {
     private:
         std::unordered_map<std::string, std::shared_ptr<Trace>> traces;
-        std::shared_ptr<SpanProcessor> processor;
+        std::shared_ptr<TraceContext> context;
         static TraceProvider provider;
         static std::mutex lock;
-        TraceProvider(std::shared_ptr<SpanProcessor> processor_) : processor(processor_){};
+        TraceProvider(std::unique_ptr<SpanProcessor> &&processor_,
+                      std::unique_ptr<Sampler> &&sampler_)
+            : context(std::make_shared<TraceContext>(std::move(processor_),
+                                                     std::move(sampler_))){};
         TraceProvider() = default;
 
     public:
         ~TraceProvider() = default;
         static TraceProvider &GetInstance();
-        static std::shared_ptr<Trace> StartTrace();
         static std::shared_ptr<Trace> GetTrace();
-        static std::shared_ptr<Trace> GetTrace(std::string trace_id);
-        static void SetSpanProcessor(std::shared_ptr<SpanProcessor> processor);
+        static void InitProvider(std::unique_ptr<SpanProcessor> &&processor_,
+                                 std::unique_ptr<Sampler> &&sampler_ = std::make_unique<AlwaysOnSampler>());
     };
 
-} // namespace trace
+};     // namespace trace
 #endif // !TRACE_TRACE_PROVIDER_H

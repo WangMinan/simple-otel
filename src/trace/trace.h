@@ -24,7 +24,7 @@ namespace trace
         Trace(std::string trace_id_, std::shared_ptr<TraceContext> context_) : trace_id(trace_id_), context(context_){};
         virtual ~Trace(){};
         virtual std::shared_ptr<Span> StartSpan(std::string name, std::string service_name);
-        std::string Id() { return this->trace_id; }
+        std::string GetId() { return this->trace_id; }
         std::shared_ptr<TraceContext> Context() { return this->context; }
     };
 

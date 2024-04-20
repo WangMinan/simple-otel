@@ -6,52 +6,72 @@
 #include "trace_metadata.h"
 #include <memory>
 #include <string>
-namespace trace
-{
-    class SpanContext
-    {
-    private:
-        std::string trace_id;
-        std::string span_id;
-        TraceFlag trace_flag;
-        std::shared_ptr<Sampler> sampler;
+namespace trace {
+class SpanContext {
+private:
+  std::string trace_id;
+  std::string span_id;
+  TraceFlag trace_flag;
+  std::shared_ptr<Sampler> sampler;
 
-    public:
-        SpanContext() = default;
-        SpanContext(
-            std::string trace_id_, std::string span_id_,
-            TraceFlag trace_flag_ = kIsSampled,
-            std::shared_ptr<Sampler> &&sampler_ = std::make_shared<AlwaysOnSampler>())
-            : trace_id(trace_id_), span_id(span_id_), trace_flag(trace_flag_),
-              sampler(sampler_){};
-        ~SpanContext() = default;
-        SpanContext(SpanContext &&other) = default;
-        SpanContext &operator=(SpanContext &&other) = default;
-        bool IsValid();
-        std::string TraceId() { return this->trace_id; };
-        std::string SpanId() { return this->span_id; }
-        TraceFlag GetTraceFlag() { return this->trace_flag; }
-        std::shared_ptr<Sampler> GetSampler() { return this->sampler; }
-    };
+public:
+  friend class Context;
+  SpanContext() = default;
+  SpanContext(
+      std::string trace_id_, std::string span_id_,
+      TraceFlag trace_flag_ = kIsSampled,
+      std::shared_ptr<Sampler> &&sampler_ = std::make_shared<AlwaysOnSampler>())
+      : trace_id(trace_id_), span_id(span_id_), trace_flag(trace_flag_),
+        sampler(sampler_){};
+  ~SpanContext() = default;
+  SpanContext(SpanContext &&other) = default;
+  SpanContext &operator=(SpanContext &&other) = default;
+  bool IsValid();
+  std::string GetTraceId() { return this->trace_id; };
+  std::string GetSpanId() { return this->span_id; }
+  TraceFlag GetTraceFlag() { return this->trace_flag; }
+  std::shared_ptr<Sampler> GetSampler() { return this->sampler; }
+};
 
-    /// @brief thread local span context
-    class Context
-    {
-    private:
-        thread_local static SpanContext span_context;
+/// @brief thread local span context
+class Context {
+private:
+  thread_local static SpanContext parent_context;
+  thread_local static SpanContext current_context;
 
-    public:
-        /// @brief create a span context from message
-        /// @param message
-        void static Extract(protocol::Message message);
+public:
+  /// @brief get parent context from message
+  /// @param message
+  void static Extract(protocol::Message message);
 
-        static std::string GetTraceId();
-        static std::string GetSpanId();
-        static TraceFlag GetTraceFlag();
-        static SpanContext &GetSpanContext();
-        static bool IsValid();
-        static std::shared_ptr<Sampler> GetSampler();
-    };
+  /// @brief get parent context
+  /// @return parent context
+  static SpanContext &GetParentContext();
+
+  /// @brief get current context
+  /// @return current context
+  static SpanContext &GetCurrentContext();
+
+  /// @brief change trace id in current context
+  /// @param trace_id_
+  static void SetTraceId(std::string trace_id_);
+
+  /// @brief change span id in current context
+  /// @param span_id_
+  static void SetSpanId(std::string span_id_);
+
+  /// @brief change trace flag in current context
+  /// @param trace_flag_
+  static void SetTraceFlag(TraceFlag trace_flag_);
+
+  /// @brief change sampler in current context
+  /// @param sampler
+  static void SetSampler(std::shared_ptr<Sampler> &&sampler);
+
+  /// @brief write current context to the message for transferring
+  /// @param message
+  static void WriteToMessage(protocol::Message &message);
+};
 
 } // namespace trace
 

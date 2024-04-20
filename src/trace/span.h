@@ -37,15 +37,15 @@ namespace trace
         void SetTag(std::string key, std::string value);
         void End();
         void SetStatus(StatusCode status);
-        std::string Id() { return this->id; };
-        std::string TraceId() { return this->trace_id; };
-        std::string ParentId() { return this->parent_id; };
-        std::string Name() { return this->name; };
-        std::string ServiceName() { return this->service_name; };
-        long StartTime() { return this->start_time; };
-        long EndTime() { return this->end_time; };
-        std::unordered_map<std::string, std::string> Tags() { return this->tags; };
-        StatusCode Status() { return this->status; };
+        std::string GetId() { return this->id; };
+        std::string GetTraceId() { return this->trace_id; };
+        std::string GetParentId() { return this->parent_id; };
+        std::string GetName() { return this->name; };
+        std::string GetServiceName() { return this->service_name; };
+        long GetStartTime() { return this->start_time; };
+        long GetEndTime() { return this->end_time; };
+        std::unordered_map<std::string, std::string> GetTags() { return this->tags; };
+        StatusCode GetStatus() { return this->status; };
     };
 
     class NoopSpan : public Span

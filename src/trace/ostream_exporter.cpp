@@ -13,22 +13,22 @@ namespace trace
     void OstreamSpanExporter::Export(Span &span)
     {
         sout << "{"
-             << "\n  \"trace_id\": \"" << span.TraceId() << "\","
-             << "\n  \"span_id\": \"" << span.Id() << "\","
-             << "\n  \"parent_span_id\": \"" << span.ParentId() << "\","
-             << "\n  \"name\": \"" << span.Name() << "\","
-             << "\n  \"service_name\": \"" << span.ServiceName() << "\","
-             << "\n  \"start_time\": " << span.StartTime() << ","
-             << "\n  \"end_time\": " << span.EndTime() << ","
+             << "\n  \"trace_id\": \"" << span.GetTraceId() << "\","
+             << "\n  \"span_id\": \"" << span.GetId() << "\","
+             << "\n  \"parent_span_id\": \"" << span.GetParentId() << "\","
+             << "\n  \"name\": \"" << span.GetName() << "\","
+             << "\n  \"service_name\": \"" << span.GetServiceName() << "\","
+             << "\n  \"start_time\": " << span.GetStartTime() << ","
+             << "\n  \"end_time\": " << span.GetEndTime() << ","
              << "\n  \"tags\": " << printTags(span) << ","
-             << "\n  \"status\": \"" << printStatus(span.Status()) << "\""
+             << "\n  \"status\": \"" << printStatus(span.GetStatus()) << "\""
              << "\n }" << std::endl;
     }
 
     std::string printTags(Span &span)
     {
         std::string tags = "{";
-        for (auto &tag : span.Tags())
+        for (auto &tag : span.GetTags())
         {
             tags += "\"" + tag.first + "\": \"" + tag.second + "\",";
         }

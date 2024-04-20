@@ -3,16 +3,16 @@
 #include <memory>
 
 namespace trace {
-std::mutex trace::TraceProvider::lock;
+std::recursive_mutex trace::TraceProvider::lock;
 trace::TraceProvider TraceProvider::provider;
 void TraceProvider::InitProvider(std::unique_ptr<SpanProcessor> &&processor_,
                                  std::unique_ptr<Sampler> &&sampler_) {
-  std::lock_guard<std::mutex> lock_guard(TraceProvider::lock);
+  std::lock_guard<std::recursive_mutex> lock_guard(TraceProvider::lock);
   provider = TraceProvider(std::move(processor_), std::move(sampler_));
 }
 
 TraceProvider &TraceProvider::GetInstance() {
-  std::lock_guard<std::mutex> lock_guard(TraceProvider::lock);
+  std::lock_guard<std::recursive_mutex> lock_guard(TraceProvider::lock);
   return provider;
 }
 
@@ -20,6 +20,7 @@ TraceProvider &TraceProvider::GetInstance() {
 /// create a trace by provider's context
 /// @return trace
 std::shared_ptr<Trace> TraceProvider::GetTrace() {
+  std::lock_guard<std::recursive_mutex> lock_guard(TraceProvider::lock);
   TraceProvider &provider = TraceProvider::GetInstance();
   SpanContext &parent_context = Context::GetParentContext();
   // if parent context is not valid, it means this is root span

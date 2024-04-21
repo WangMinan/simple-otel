@@ -5,7 +5,7 @@
 namespace utils {
 class IdGenerator {
 public:
-  std::string static GenerateId(int length = 16) {
+  std::string static GenerateId() {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
     return boost::uuids::to_string(uuid);
   }

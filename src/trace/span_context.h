@@ -3,6 +3,7 @@
 #include "../protocol/message.h"
 #include "sampler.h"
 #include "sampler/alway_on_sampler.h"
+#include "span_exporter.h"
 #include "trace_metadata.h"
 #include <memory>
 #include <string>
@@ -39,6 +40,7 @@ class Context {
 private:
   thread_local static SpanContext parent_context;
   thread_local static std::vector<SpanContext> current_contexts;
+  thread_local static std::vector<std::shared_ptr<Span>> active_spans;
 
 public:
   /// @brief get parent context from message
@@ -71,6 +73,16 @@ public:
 
   /// @brief detach the current span context
   static void Detach();
+
+  static void AddActiveSpan(std::shared_ptr<Span> span);
+
+  /// @brief this function will not check if the last active span in thread
+  /// local is current span. Make sure ending span in correct order
+  static void RemoveLatestActiveSpan();
+
+  /// @brief get current span. if there is no active span, return nullptr
+  /// @return current span or nullptr
+  static std::shared_ptr<Span> GetCurrentSpan();
 };
 
 } // namespace trace

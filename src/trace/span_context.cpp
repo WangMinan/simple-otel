@@ -18,6 +18,7 @@ namespace trace {
 
 thread_local SpanContext Context::parent_context;
 thread_local std::vector<SpanContext> Context::current_contexts;
+thread_local std::vector<std::shared_ptr<Span>> Context::active_spans;
 
 bool SpanContext::IsValid() { return !trace_id.empty() && !span_id.empty(); }
 
@@ -36,7 +37,13 @@ void Context::Extract(protocol::Message message) {
   }
 }
 
-SpanContext &Context::GetParentContext() { return parent_context; }
+SpanContext &Context::GetParentContext() {
+  if (current_contexts.empty() || current_contexts.size() == 1) {
+    return parent_context;
+  } else {
+    return current_contexts[current_contexts.size() - 2];
+  }
+}
 
 SpanContext &Context::GetCurrentContext() {
   if (current_contexts.empty()) {
@@ -70,5 +77,20 @@ void Context::Detach() {
     return;
   }
   current_contexts.erase(current_contexts.end() - 1);
+}
+
+void Context::AddActiveSpan(std::shared_ptr<Span> span) {
+  active_spans.push_back(span);
+}
+
+void Context::RemoveLatestActiveSpan() {
+  active_spans.erase(active_spans.end() - 1);
+}
+
+std::shared_ptr<Span> Context::GetCurrentSpan() {
+  if (active_spans.empty()) {
+    return nullptr;
+  }
+  return active_spans.back();
 }
 } // namespace trace

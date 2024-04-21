@@ -26,6 +26,7 @@ std::shared_ptr<Span> Trace::StartSpan(std::string name,
                                      parent_id, this->context);
   Context::Attach(span->GetTraceId(), span->GetId(), TraceFlag::kIsSampled,
                   span->GetTraceContext()->GetSampler().Clone());
+  Context::AddActiveSpan(span);
   return span;
 }
 

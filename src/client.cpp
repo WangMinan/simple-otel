@@ -1,10 +1,9 @@
 // C++ program to illustrate the client application in the
 // socket programming
-#include "ostream_exporter.h"
+#include "ostream_span_exporter.h"
 #include "protocol/message.h"
 #include "span_context.h"
 #include "span_metadata.h"
-#include "trace/ostream_exporter.h"
 #include "trace_provider.h"
 #include <cstring>
 #include <memory>

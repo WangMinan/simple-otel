@@ -1,6 +1,7 @@
 #include "span.h"
 #include "../utils/id_generator.h"
 #include "../utils/timestamp_generator.h"
+#include "span_context.h"
 #include <memory>
 
 namespace trace
@@ -28,6 +29,7 @@ namespace trace
     {
         this->has_ended_ = true;
         this->end_time = utils::TimestampGenerator::Now();
+        Context::Detach();
         this->trace_context->Processor().OnEnd(*this);
     }
 

@@ -6,6 +6,7 @@
 #include "trace_metadata.h"
 #include <memory>
 #include <string>
+#include <vector>
 namespace trace {
 class SpanContext {
 private:
@@ -37,7 +38,7 @@ public:
 class Context {
 private:
   thread_local static SpanContext parent_context;
-  thread_local static SpanContext current_context;
+  thread_local static std::vector<SpanContext> current_contexts;
 
 public:
   /// @brief get parent context from message
@@ -52,25 +53,24 @@ public:
   /// @return current context
   static SpanContext &GetCurrentContext();
 
-  /// @brief change trace id in current context
-  /// @param trace_id_
-  static void SetTraceId(std::string trace_id_);
-
-  /// @brief change span id in current context
-  /// @param span_id_
-  static void SetSpanId(std::string span_id_);
-
   /// @brief change trace flag in current context
   /// @param trace_flag_
   static void SetTraceFlag(TraceFlag trace_flag_);
 
-  /// @brief change sampler in current context
-  /// @param sampler
-  static void SetSampler(std::shared_ptr<Sampler> &&sampler);
-
   /// @brief write current context to the message for transferring
   /// @param message
   static void WriteToMessage(protocol::Message &message);
+
+  /// @brief attach a new span context. its scope is limited to the new span
+  /// @param trace_id
+  /// @param span_id
+  /// @param trace_flag
+  /// @param sampler
+  static void Attach(std::string trace_id, std::string span_id,
+                     TraceFlag trace_flag, std::shared_ptr<Sampler> &&sampler);
+
+  /// @brief detach the current span context
+  static void Detach();
 };
 
 } // namespace trace

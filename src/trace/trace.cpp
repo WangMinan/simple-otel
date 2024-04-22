@@ -11,7 +11,8 @@ std::shared_ptr<Span> Trace::StartSpan(std::string name,
   // 获取当前span的上下文，它将成为新span的父span
   SpanContext &parent_context = Context::GetCurrentContext();
   auto result = this->context->GetSampler().ShouldSampled(parent_context);
-  if (!result.ShouldSample()) {
+  if (!result.ShouldSample() &&
+      result.GetTraceFlag() != TraceFlag::kIsWaiting) {
     Context::Attach(this->trace_id, "", result.GetTraceFlag(),
                     parent_context.GetSampler()->Clone());
     return std::make_shared<NoopSpan>();
@@ -24,7 +25,7 @@ std::shared_ptr<Span> Trace::StartSpan(std::string name,
   }
   auto span = std::make_shared<Span>(name, service_name, this->trace_id,
                                      parent_id, this->context);
-  Context::Attach(span->GetTraceId(), span->GetId(), TraceFlag::kIsSampled,
+  Context::Attach(span->GetTraceId(), span->GetId(), result.GetTraceFlag(),
                   span->GetTraceContext()->GetSampler().Clone());
   Context::AddActiveSpan(span);
   return span;

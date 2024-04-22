@@ -1,6 +1,7 @@
 #include "span_context.h"
 #include "sampler.h"
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -19,6 +20,8 @@ namespace trace {
 thread_local SpanContext Context::parent_context;
 thread_local std::vector<SpanContext> Context::current_contexts;
 thread_local std::vector<std::shared_ptr<Span>> Context::active_spans;
+thread_local std::vector<std::vector<std::shared_ptr<RespContext>>>
+    Context::resp_contexts;
 
 bool SpanContext::IsValid() { return !trace_id.empty() && !span_id.empty(); }
 
@@ -77,10 +80,13 @@ void Context::Detach() {
     return;
   }
   current_contexts.erase(current_contexts.end() - 1);
+  active_spans.erase(active_spans.end() - 1);
+  resp_contexts.erase(resp_contexts.end() - 1);
 }
 
 void Context::AddActiveSpan(std::shared_ptr<Span> span) {
   active_spans.push_back(span);
+  resp_contexts.emplace_back(std::vector<std::shared_ptr<RespContext>>());
 }
 
 void Context::RemoveLatestActiveSpan() {
@@ -92,5 +98,24 @@ std::shared_ptr<Span> Context::GetCurrentSpan() {
     return nullptr;
   }
   return active_spans.back();
+}
+std::vector<std::shared_ptr<RespContext>> *Context::GetCurrentRespContext() {
+  if (resp_contexts.empty()) {
+    return nullptr;
+  }
+  return &resp_contexts.back();
+}
+
+std::vector<std::shared_ptr<RespContext>> *Context::GetParentRespContext() {
+  if (resp_contexts.size() <= 1) {
+    return nullptr;
+  }
+  return &resp_contexts[resp_contexts.size() - 2];
+}
+
+void Context::AddRespContext(TraceFlag trace_flag) {
+  auto resp_context = std::make_shared<RespContext>(trace_flag);
+  auto current = GetCurrentRespContext();
+  current->push_back(resp_context);
 }
 } // namespace trace

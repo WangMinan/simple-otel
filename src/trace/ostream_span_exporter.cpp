@@ -20,7 +20,7 @@ void OstreamSpanExporter::Export(Span &span) {
        << "\n  \"end_time\": " << span.GetEndTime() << ","
        << "\n  \"tags\": " << printTags(span) << ","
        << "\n  \"status\": \"" << printStatus(span.GetStatus()) << "\""
-       << "\n }" << std::endl;
+       << "\n}" << std::endl;
 }
 
 std::string printTags(Span &span) {

@@ -25,6 +25,7 @@ private:
   StatusCode status;
   bool has_ended_;
   std::shared_ptr<TraceContext> trace_context;
+  TraceFlag trace_flag;
 
 protected:
   Span() = default;

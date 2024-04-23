@@ -1,5 +1,7 @@
 #include "ostream_span_exporter.h"
+#include "post_sample_processor.h"
 #include "protocol/message.h"
+#include "sampler/tail_sampler.h"
 #include "span_context.h"
 #include "trace/trace.h"
 #include "trace_provider.h"
@@ -13,8 +15,16 @@
 
 void initTrace();
 
+void initPostTrace() {
+  auto exporter = std::make_unique<trace::OstreamSpanExporter>();
+  auto sampler = std::make_unique<trace::TailSampler>(3);
+  auto processor = std::make_unique<trace::PostSampleProcessor>(
+      std::move(exporter), std::move(sampler));
+  trace::TraceProvider::InitProvider(std::move(processor));
+}
+
 int main(int argc, char const *argv[]) {
-  initTrace();
+  initPostTrace();
   int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
   sockaddr_in addr;
   addr.sin_family = AF_INET;
@@ -36,6 +46,19 @@ int main(int argc, char const *argv[]) {
     trace::Context::Extract(msg);
     auto tracer = trace::TraceProvider::GetTrace();
     auto span = tracer->StartSpan("server", "server");
+
+    try {
+      throw std::runtime_error("error");
+    } catch (const std::exception &e) {
+      span->SetStatus(trace::StatusCode::kError);
+      trace::Context::SetTraceFlag(TraceFlag::kIsSampled);
+      span->End();
+      trace::RespContext &resp_context = trace::Context::GetReturnContext();
+      auto msg = resp_context.ToMessage();
+      std::string message = msg.Serialize();
+      write(clientSocket, message.c_str(), strlen(message.c_str()));
+      return 0;
+    }
 
     write(clientSocket, buf, len);
 

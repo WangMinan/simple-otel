@@ -1,7 +1,9 @@
 // C++ program to illustrate the client application in the
 // socket programming
 #include "ostream_span_exporter.h"
+#include "post_sample_processor.h"
 #include "protocol/message.h"
+#include "sampler/tail_sampler.h"
 #include "span_context.h"
 #include "span_metadata.h"
 #include "trace_provider.h"
@@ -13,8 +15,17 @@
 #include <unistd.h>
 
 void initTrace();
+
+void initPostTrace() {
+  auto exporter = std::make_unique<trace::OstreamSpanExporter>();
+  auto sampler = std::make_unique<trace::TailSampler>(3);
+  auto processor = std::make_unique<trace::PostSampleProcessor>(
+      std::move(exporter), std::move(sampler));
+  trace::TraceProvider::InitProvider(std::move(processor));
+}
+
 int main() {
-  initTrace();
+  initPostTrace();
   // creating socket
   int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -40,10 +51,14 @@ int main() {
   char buffer[1024];
   recv(clientSocket, buffer, sizeof(buffer), 0);
 
-  // closing socket
-  close(clientSocket);
+  std::string recv_msg(buffer);
+  protocol::Message msg_recv = protocol::Message::Deserialize(recv_msg);
+  auto resp_context = trace::RespContext::FromMessage(msg_recv);
+  trace::Context::AddRespContext(resp_context);
   span->SetStatus(trace::StatusCode::kOk);
   span->End();
+  // closing socket
+  close(clientSocket);
 
   return 0;
 }

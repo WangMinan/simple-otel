@@ -1,11 +1,13 @@
 #ifndef TRACE_SPAN_CONTEXT_H
 #define TRACE_SPAN_CONTEXT_H
 #include "../protocol/message.h"
+#include "resp_context.h"
 #include "sampler.h"
 #include "sampler/alway_on_sampler.h"
 #include "span_exporter.h"
 #include "trace_metadata.h"
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 namespace trace {
@@ -41,6 +43,10 @@ private:
   thread_local static SpanContext parent_context;
   thread_local static std::vector<SpanContext> current_contexts;
   thread_local static std::vector<std::shared_ptr<Span>> active_spans;
+  thread_local static std::vector<std::vector<std::shared_ptr<RespContext>>>
+      resp_contexts;
+  // 返回给请求发出者的上下文
+  thread_local static std::unique_ptr<RespContext> return_context;
 
 public:
   /// @brief get parent context from message
@@ -83,6 +89,21 @@ public:
   /// @brief get current span. if there is no active span, return nullptr
   /// @return current span or nullptr
   static std::shared_ptr<Span> GetCurrentSpan();
+
+  /// @brief get the response context of the current span. The response context
+  /// is created by its child span
+  /// @return
+  static std::vector<std::shared_ptr<RespContext>> *GetCurrentRespContext();
+
+  static void AddRespContext(TraceFlag trace_flag);
+
+  static std::vector<std::shared_ptr<RespContext>> *GetParentRespContext();
+
+  static void AddRespContext(std::shared_ptr<RespContext> context);
+
+  static void SetReturnContext(TraceFlag trace_flag_);
+
+  static RespContext &GetReturnContext();
 };
 
 } // namespace trace

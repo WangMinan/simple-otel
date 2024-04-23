@@ -11,6 +11,7 @@ enum class SampleStrategy {
   kAlwaysSample = 0,
   kNeverSample = 1,
   kRandomSample = 2,
+  kTailSample = 3
 };
 
 class SampleResult {

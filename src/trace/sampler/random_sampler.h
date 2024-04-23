@@ -1,7 +1,9 @@
 #include "sampler.h"
 #include "span_context.h"
 #include "trace_metadata.h"
+#include <memory>
 #include <stdlib.h>
+#include <string>
 
 namespace trace {
 class RandomSampler : public Sampler {
@@ -14,6 +16,13 @@ public:
   RandomSampler(int rate_) : rate(rate_){};
   SampleResult ShouldSampled(SpanContext &context) override;
   ~RandomSampler() = default;
+  std::unique_ptr<Sampler> Clone() override {
+    return std::make_unique<RandomSampler>(rate);
+  };
+  // TODO: Serialize
+  std::string Serialize() override {
+    return std::to_string(static_cast<int>(SampleStrategy::kRandomSample));
+  }
 };
 
 inline SampleResult RandomSampler::ShouldSampled(SpanContext &context) {

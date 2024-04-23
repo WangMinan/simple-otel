@@ -51,10 +51,14 @@ int main() {
   char buffer[1024];
   recv(clientSocket, buffer, sizeof(buffer), 0);
 
-  // closing socket
-  close(clientSocket);
+  std::string recv_msg(buffer);
+  protocol::Message msg_recv = protocol::Message::Deserialize(recv_msg);
+  auto resp_context = trace::RespContext::FromMessage(msg_recv);
+  trace::Context::AddRespContext(resp_context);
   span->SetStatus(trace::StatusCode::kOk);
   span->End();
+  // closing socket
+  close(clientSocket);
 
   return 0;
 }

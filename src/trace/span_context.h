@@ -45,6 +45,8 @@ private:
   thread_local static std::vector<std::shared_ptr<Span>> active_spans;
   thread_local static std::vector<std::vector<std::shared_ptr<RespContext>>>
       resp_contexts;
+  // 返回给请求发出者的上下文
+  thread_local static std::unique_ptr<RespContext> return_context;
 
 public:
   /// @brief get parent context from message
@@ -96,6 +98,12 @@ public:
   static void AddRespContext(TraceFlag trace_flag);
 
   static std::vector<std::shared_ptr<RespContext>> *GetParentRespContext();
+
+  static void AddRespContext(std::shared_ptr<RespContext> context);
+
+  static void SetReturnContext(TraceFlag trace_flag_);
+
+  static RespContext &GetReturnContext();
 };
 
 } // namespace trace

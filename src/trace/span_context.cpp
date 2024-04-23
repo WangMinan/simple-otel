@@ -22,6 +22,7 @@ thread_local std::vector<SpanContext> Context::current_contexts;
 thread_local std::vector<std::shared_ptr<Span>> Context::active_spans;
 thread_local std::vector<std::vector<std::shared_ptr<RespContext>>>
     Context::resp_contexts;
+thread_local std::unique_ptr<RespContext> Context::return_context;
 
 bool SpanContext::IsValid() { return !trace_id.empty() && !span_id.empty(); }
 
@@ -113,9 +114,21 @@ std::vector<std::shared_ptr<RespContext>> *Context::GetParentRespContext() {
   return &resp_contexts[resp_contexts.size() - 2];
 }
 
+void Context::AddRespContext(std::shared_ptr<RespContext> context) {
+  auto current = GetCurrentRespContext();
+  current->push_back(context);
+}
+
+void Context::SetReturnContext(TraceFlag trace_flag_) {
+  return_context = std::make_unique<RespContext>(trace_flag_);
+}
+
+RespContext &Context::GetReturnContext() { return *return_context; }
+
 void Context::AddRespContext(TraceFlag trace_flag) {
   auto resp_context = std::make_shared<RespContext>(trace_flag);
   auto current = GetCurrentRespContext();
   current->push_back(resp_context);
 }
+
 } // namespace trace

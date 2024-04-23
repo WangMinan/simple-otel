@@ -1,4 +1,5 @@
 #include "post_sampler.h"
+#include "span_context.h"
 #include "trace_metadata.h"
 
 #ifndef TRACE_TAIL_SAMPLER_H
@@ -13,11 +14,20 @@ public:
   TailSampler(int rate_) : rate(rate_){};
   ~TailSampler() = default;
   SampleResult
-  PostSample(std::vector<std::shared_ptr<RespContext>> &contexts) override {
+  PostSample(std::vector<std::shared_ptr<RespContext>> &resp_contexts,
+             SpanContext &context) override {
+
+    if (context.GetTraceFlag() == TraceFlag::kIsSampled) {
+      return SampleResult(true, SampleStrategy::kTailSample,
+                          TraceFlag::kIsSampled);
+    } else if (context.GetTraceFlag() == TraceFlag::kIsDiscarded) {
+      return SampleResult(false, SampleStrategy::kTailSample,
+                          TraceFlag::kIsDiscarded);
+    }
 
     TraceFlag trace_flag;
     // 链路尾部，开启概率采样
-    if (contexts.empty()) {
+    if (resp_contexts.empty()) {
 
       srand(time(NULL));
       int res = rand() % 100;
@@ -25,7 +35,7 @@ public:
                           res < rate ? TraceFlag::kIsSampled
                                      : TraceFlag::kIsDiscarded);
     }
-    for (const auto ctx : contexts) {
+    for (const auto ctx : resp_contexts) {
       if (ctx->GetTraceFlag() == TraceFlag::kIsSampled) {
         return SampleResult(true, SampleStrategy::kTailSample,
                             TraceFlag::kIsSampled);

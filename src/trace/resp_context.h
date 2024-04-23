@@ -1,6 +1,8 @@
 #include "../protocol/message.h"
 #include "trace_metadata.h"
+#include <memory>
 #include <string>
+#include <utility>
 
 #ifndef TRACE_RESP_CONTEXT_H
 #define TRACE_RESP_CONTEXT_H
@@ -13,12 +15,17 @@ private:
 public:
   RespContext(TraceFlag trace_flag_) : trace_flag(trace_flag_){};
   ~RespContext() = default;
-  RespContext FromMessage(protocol::Message &message) {
+  static std::shared_ptr<RespContext> FromMessage(protocol::Message &message) {
     std::string trace_flag_ = message.GetHeader("trace_flag");
     TraceFlag trace_flag = TraceFlagHandler::GetTraceFlag(trace_flag_);
-    return RespContext(trace_flag);
+    return std::make_shared<RespContext>(trace_flag);
   }
   TraceFlag GetTraceFlag() { return trace_flag; }
+  protocol::Message ToMessage() {
+    protocol::Message msg;
+    msg.SetHeader("trace_flag", TraceFlagHandler::Serialize(trace_flag));
+    return msg;
+  };
 };
 
 } // namespace trace

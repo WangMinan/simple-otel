@@ -1,6 +1,6 @@
 #include "post_sample_processor.h"
+#include "span.h"
 #include "span_context.h"
-#include <algorithm>
 #include <memory>
 #include <stdexcept>
 
@@ -10,11 +10,14 @@ using std::make_unique;
 void PostSampleProcessor::OnStart(Span &span) {}
 void PostSampleProcessor::OnEnd(Span &span) {
   auto resp_context = Context::GetCurrentRespContext();
-  SampleResult result = this->sampler->PostSample(*resp_context);
+  SpanContext &span_context = Context::GetCurrentContext();
+  SampleResult result = this->sampler->PostSample(*resp_context, span_context);
   auto parent_context = Context::GetParentRespContext();
   if (parent_context != nullptr) {
     auto resp = std::make_shared<RespContext>(result.GetTraceFlag());
     parent_context->push_back(resp);
+  } else {
+    Context::SetReturnContext(result.GetTraceFlag());
   }
   if (result.ShouldSample()) {
     this->exporter->Export(span);

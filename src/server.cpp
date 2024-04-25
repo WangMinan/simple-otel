@@ -1,5 +1,5 @@
 #include "exporter/ostream_span_exporter.h"
-#include "post_sample_processor.h"
+#include "processor/post_sample_processor.h"
 #include "protocol/message.h"
 #include "sampler/tail_sampler.h"
 #include "span_context.h"

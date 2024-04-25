@@ -1,6 +1,4 @@
 #include "exporter/grpc_span_exporter.h"
-#include "span/span.grpc.pb.h"
-#include "span/span.pb.h"
 #include "span_metadata.h"
 #include "trace_provider.h"
 #include <arpa/inet.h>
@@ -11,7 +9,6 @@
 #include <netdb.h>
 #include <unistd.h>
 
-using boost::asio::ip::tcp;
 
 void initTrace() {
 

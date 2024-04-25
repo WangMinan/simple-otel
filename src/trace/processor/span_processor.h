@@ -6,6 +6,7 @@
 
 namespace trace
 {
+    class Span;
     class SpanProcessor
     {
     protected:

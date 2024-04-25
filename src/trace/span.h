@@ -1,5 +1,5 @@
+#include "processor/span_processor.h"
 #include "span_metadata.h"
-#include "span_processor.h"
 #include "trace_context.h"
 #include <memory>
 #include <string>
@@ -55,6 +55,33 @@ class NoopSpan : public Span {
 public:
   NoopSpan(){};
 };
+
+struct SpanRecord {
+  std::string id;
+  std::string name;
+  std::string service_name;
+  std::string trace_id;
+  std::string parent_id;
+  long start_time;
+  long end_time;
+  std::unordered_map<std::string, std::string> tags;
+  StatusCode status;
+};
+
+inline SpanRecord SpanToRecord(Span &span) {
+  SpanRecord record = {
+    span.GetId(),
+    span.GetName(),
+    span.GetServiceName(),
+    span.GetTraceId(),
+    span.GetParentId(),
+    span.GetStartTime(),
+    span.GetEndTime(),
+    span.GetTags(),
+    span.GetStatus()
+  };
+  return record;
+}
 
 }; // namespace trace
 

@@ -3,7 +3,7 @@
 #define TRACE_TRACE_CONTEXT_H
 
 #include "sampler.h"
-#include "span_processor.h"
+#include "processor/span_processor.h"
 #include <memory>
 namespace trace {
 class TraceContext {

@@ -2,10 +2,8 @@
 #include "span.h"
 #include "span_context.h"
 #include <memory>
-#include <stdexcept>
 
 namespace trace {
-using std::make_unique;
 
 void PostSampleProcessor::OnStart(Span &span) {}
 void PostSampleProcessor::OnEnd(Span &span) {
@@ -20,7 +18,8 @@ void PostSampleProcessor::OnEnd(Span &span) {
     Context::SetReturnContext(result.GetTraceFlag());
   }
   if (result.ShouldSample()) {
-    this->exporter->Export(span);
+    SpanRecord record = SpanToRecord(span);
+    this->exporter->Export(record);
   }
 }
 } // namespace trace

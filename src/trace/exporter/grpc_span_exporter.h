@@ -2,6 +2,7 @@
 #include "span.h"
 #include <grpcpp/grpcpp.h>
 #include <memory>
+#include <vector>
 
 using arktouros::proto::collector::v1::SpanService;
 using grpc::Channel;
@@ -22,7 +23,8 @@ public:
       : stub(SpanService::NewStub(
             std::static_pointer_cast<grpc::ChannelInterface>(channel))){};
   ~GrpcSpanClient() = default;
-  SpanExportResponse Export(Span &span);
+  SpanExportResponse Export(SpanRecord &span);
+  SpanExportResponse Export(std::vector<SpanRecord> &records);
 };
 
 class GrpcSpanExporter : public SpanExporter {
@@ -35,6 +37,8 @@ public:
 
   ~GrpcSpanExporter() = default;
 
-  void Export(Span &span) override;
+  void Export(SpanRecord &span) override;
+
+  void Export(std::vector<SpanRecord> &records) override;
 };
 } // namespace trace

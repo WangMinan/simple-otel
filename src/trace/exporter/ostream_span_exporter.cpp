@@ -4,31 +4,39 @@
 #include "span_exporter.h"
 #include "span_metadata.h"
 #include <string>
+#include <unordered_map>
+#include <vector>
 namespace trace {
-std::string printTags(Span &span);
+std::string printTags(std::unordered_map<std::string, std::string> &tags);
 std::string printStatus(StatusCode status);
 
-void OstreamSpanExporter::Export(Span &span) {
+void OstreamSpanExporter::Export(SpanRecord &span) {
   sout << "{"
-       << "\n  \"trace_id\": \"" << span.GetTraceId() << "\","
-       << "\n  \"span_id\": \"" << span.GetId() << "\","
-       << "\n  \"parent_span_id\": \"" << span.GetParentId() << "\","
-       << "\n  \"name\": \"" << span.GetName() << "\","
-       << "\n  \"service_name\": \"" << span.GetServiceName() << "\","
-       << "\n  \"start_time\": " << span.GetStartTime() << ","
-       << "\n  \"end_time\": " << span.GetEndTime() << ","
-       << "\n  \"tags\": " << printTags(span) << ","
-       << "\n  \"status\": \"" << printStatus(span.GetStatus()) << "\""
+       << "\n  \"trace_id\": \"" << span.trace_id << "\","
+       << "\n  \"span_id\": \"" << span.id << "\","
+       << "\n  \"parent_span_id\": \"" << span.parent_id << "\","
+       << "\n  \"name\": \"" << span.name << "\","
+       << "\n  \"service_name\": \"" << span.service_name << "\","
+       << "\n  \"start_time\": " << span.start_time << ","
+       << "\n  \"end_time\": " << span.end_time << ","
+       << "\n  \"tags\": " << printTags(span.tags) << ","
+       << "\n  \"status\": \"" << printStatus(span.status) << "\""
        << "\n}" << std::endl;
 }
 
-std::string printTags(Span &span) {
-  std::string tags = "{";
-  for (auto &tag : span.GetTags()) {
-    tags += "\"" + tag.first + "\": \"" + tag.second + "\",";
+void OstreamSpanExporter::Export(std::vector<SpanRecord> &records) {
+  for (auto record : records) {
+    Export(record);
   }
-  tags += "}";
-  return tags;
+}
+
+std::string printTags(std::unordered_map<std::string, std::string> &tags) {
+  std::string tags_str = "{";
+  for (auto &tag : tags) {
+    tags_str += "\"" + tag.first + "\": \"" + tag.second + "\",";
+  }
+  tags_str += "}";
+  return tags_str;
 }
 
 std::string printStatus(StatusCode status) {

@@ -2,7 +2,7 @@
 #ifndef TRACE_TRACE_PROVIDER_H
 #define TRACE_TRACE_PROVIDER_H
 #include "span_context.h"
-#include "span_processor.h"
+#include "processor/span_processor.h"
 #include "trace.h"
 #include "trace_context.h"
 #include <memory>

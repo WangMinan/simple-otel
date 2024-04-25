@@ -1,8 +1,6 @@
 #include "span_context.h"
 #include "sampler.h"
 #include <memory>
-#include <optional>
-#include <stdexcept>
 #include <string>
 #include <vector>
 

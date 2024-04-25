@@ -10,8 +10,8 @@ namespace trace
 
     void SimpleSpanProcessor::OnEnd(Span &span)
     {
-
-        this->exporter->Export(span);
+        SpanRecord record = SpanToRecord(span);
+        this->exporter->Export(record);
     }
 
     

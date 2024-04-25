@@ -23,14 +23,4 @@ void PostSampleProcessor::OnEnd(Span &span) {
     this->exporter->Export(span);
   }
 }
-std::unique_ptr<SpanProcessor> PostSampleProcessor::Clone() {
-  auto sampler = this->sampler->Clone();
-  if (auto post_sampler = dynamic_cast<PostSampler *>(sampler.get())) {
-    sampler.release();
-    std::unique_ptr<PostSampler> s(post_sampler);
-    return make_unique<PostSampleProcessor>(std::move(this->exporter->Clone()),
-                                            std::move(s));
-  }
-  throw std::runtime_error("clone failed");
-}
 } // namespace trace

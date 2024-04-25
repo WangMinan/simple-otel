@@ -1,4 +1,4 @@
-#include "ostream_span_exporter.h"
+#include "exporter/ostream_span_exporter.h"
 #include "post_sample_processor.h"
 #include "sampler/tail_sampler.h"
 #include "span_context.h"
@@ -47,11 +47,6 @@ int main(int argc, char const *argv[]) {
 
   span1->SetStatus(trace::StatusCode::kOk);
   span1->End();
-
-  nlog::OstreamLogExporter exporter;
-  auto log = nlog::LogRecord("test", "test", "test", "test", false, 0,
-                             nlog::LogLevel::DEBUG);
-  exporter.Export(log);
 
   return 0;
 }

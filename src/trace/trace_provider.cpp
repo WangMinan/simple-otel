@@ -30,9 +30,8 @@ std::shared_ptr<Trace> TraceProvider::GetTrace() {
 
     return trace;
   } else {
-    auto context =
-        std::make_shared<TraceContext>(provider.context->Processor().Clone(),
-                                       parent_context.GetSampler()->Clone());
+    auto context = std::make_shared<TraceContext>(
+        provider.context->Processor(), parent_context.GetSampler()->Clone());
     auto trace = std::make_shared<Trace>(parent_context.GetTraceId(), context);
     return trace;
   }

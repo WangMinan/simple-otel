@@ -3,7 +3,6 @@
 #include "span.h"
 #include "span_exporter.h"
 #include "span_metadata.h"
-#include <memory>
 #include <string>
 namespace trace {
 std::string printTags(Span &span);
@@ -45,7 +44,4 @@ std::string printStatus(StatusCode status) {
   }
 }
 
-std::unique_ptr<SpanExporter> OstreamSpanExporter::Clone() {
-  return std::make_unique<OstreamSpanExporter>();
-}
 } // namespace trace

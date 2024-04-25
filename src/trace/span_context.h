@@ -4,7 +4,7 @@
 #include "resp_context.h"
 #include "sampler.h"
 #include "sampler/alway_on_sampler.h"
-#include "span_exporter.h"
+#include "exporter/span_exporter.h"
 #include "trace_metadata.h"
 #include <memory>
 #include <optional>

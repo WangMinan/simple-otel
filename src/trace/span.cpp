@@ -17,7 +17,7 @@ Span::Span(std::string name, std::string service_name, std::string trace_id,
   this->end_time = 0;
   this->status = StatusCode::kUnset;
   this->trace_context = trace_context_;
-  this->trace_context->Processor().OnStart(*this);
+  this->trace_context->Processor()->OnStart(*this);
 }
 
 void Span::SetTag(std::string key, std::string value) {
@@ -27,7 +27,7 @@ void Span::SetTag(std::string key, std::string value) {
 void Span::End() {
   this->has_ended_ = true;
   this->end_time = utils::TimestampGenerator::Now();
-  this->trace_context->Processor().OnEnd(*this);
+  this->trace_context->Processor()->OnEnd(*this);
   Context::Detach();
 }
 

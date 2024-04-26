@@ -4,13 +4,12 @@
 #include "resp_context.h"
 #include "sampler.h"
 #include "sampler/alway_on_sampler.h"
-#include "span_exporter.h"
 #include "trace_metadata.h"
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 namespace trace {
+class Span;
 class SpanContext {
 private:
   std::string trace_id;

@@ -9,7 +9,10 @@ namespace trace {
 class PostSampler : public Sampler {
 public:
   virtual ~PostSampler() = default;
-  virtual SampleResult PostSample(std::vector<std::shared_ptr<RespContext>> &resp_contexts, SpanContext &context) = 0;
+  virtual SampleResult
+  PostSample(std::vector<std::shared_ptr<RespContext>> &resp_contexts,
+             SpanContext &context) = 0;
+  bool IsPostSampler() override { return true; }
 };
 
 } // namespace trace

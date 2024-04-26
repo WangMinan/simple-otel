@@ -3,7 +3,9 @@
 #include <memory>
 #include <string>
 
-namespace log {
+#ifndef LOG_LOGGER_H
+#define LOG_LOGGER_H
+namespace nlog {
 class Logger {
 private:
   std::unique_ptr<LogExporter> exporter;
@@ -20,3 +22,4 @@ public:
 };
 
 } // namespace log
+#endif // !LOG_LOGGER_H

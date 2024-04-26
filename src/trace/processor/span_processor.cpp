@@ -10,12 +10,9 @@ namespace trace
 
     void SimpleSpanProcessor::OnEnd(Span &span)
     {
-
-        this->exporter->Export(span);
+        SpanRecord record = SpanToRecord(span);
+        this->exporter->Export(record);
     }
 
-    std::unique_ptr<SpanProcessor> SimpleSpanProcessor::Clone()
-    {
-        return std::make_unique<SimpleSpanProcessor>(std::move(this->exporter->Clone()));
-    }
+    
 }

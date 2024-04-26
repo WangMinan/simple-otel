@@ -17,7 +17,6 @@ public:
   ~PostSampleProcessor() = default;
   void OnStart(Span &span) override;
   void OnEnd(Span &span) override;
-  std::unique_ptr<SpanProcessor> Clone() override;
 };
 
 } // namespace trace

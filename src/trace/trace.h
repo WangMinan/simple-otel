@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include "span.h"
-#include "span_processor.h"
+#include "processor/span_processor.h"
 #include "trace_context.h"
 namespace trace
 {

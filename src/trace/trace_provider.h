@@ -2,7 +2,7 @@
 #ifndef TRACE_TRACE_PROVIDER_H
 #define TRACE_TRACE_PROVIDER_H
 #include "span_context.h"
-#include "span_processor.h"
+#include "processor/span_processor.h"
 #include "trace.h"
 #include "trace_context.h"
 #include <memory>
@@ -17,9 +17,9 @@ private:
   std::shared_ptr<TraceContext> context;
   static TraceProvider provider;
   static std::recursive_mutex lock;
-  TraceProvider(std::unique_ptr<SpanProcessor> &&processor_,
+  TraceProvider(std::shared_ptr<SpanProcessor> processor_,
                 std::unique_ptr<Sampler> &&sampler_)
-      : context(std::make_shared<TraceContext>(std::move(processor_),
+      : context(std::make_shared<TraceContext>(processor_,
                                                std::move(sampler_))){};
   TraceProvider() = default;
 

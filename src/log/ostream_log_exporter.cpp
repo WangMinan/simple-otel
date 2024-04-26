@@ -15,7 +15,7 @@ void OstreamLogExporter::Export(LogRecord &log_record) {
             << "\n \"timestamp\": " << log_record.GetTimestamp() << ","
             << "\n \"level\": \"" << printLogLevel(log_record.GetLogLevel()) << "\","
             << "\n \"tags\": " << printTags(tags) << ","
-            << "\n \"error\": " << log_record.GetError() << "\n }"
+            << "\n \"error\": " << printError(log_record.GetError()) << "\n }"
             << std::endl;
 }
 

@@ -68,5 +68,9 @@ inline std::string printTags(std::unordered_map<std::string, std::string> &tags)
   return tags_str;
 }
 
+inline std::string printError(bool error) {
+  return error ? "true" : "false";
+}
+
 } // namespace logger
 #endif // !LOG_H

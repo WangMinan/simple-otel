@@ -2,7 +2,7 @@
 
 #ifndef LOG_LOG_EXPORTER_H
 #define LOG_LOG_EXPORTER_H
-namespace nlog {
+namespace logger {
 class LogExporter {
 public:
   LogExporter() = default;

@@ -16,7 +16,7 @@ void initTrace() {
       "localhost:50051", grpc::InsecureChannelCredentials()));
   auto processor =
       std::make_unique<trace::SimpleSpanProcessor>(std::move(exporter));
-  trace::TraceProvider::InitProvider(std::move(processor));
+  trace::TraceProvider::InitProvider(std::move(processor), "grpc_span_exporter_test");
 }
 
 int main() {
@@ -24,9 +24,9 @@ int main() {
   initTrace();
   std::cout << "init" << std::endl;
   auto tracer = trace::TraceProvider::GetTrace();
-  auto span1 = tracer->StartSpan("test", "service1");
+  auto span1 = tracer->StartSpan("test");
   sleep(3);
-  auto span2 = tracer->StartSpan("test2", "service1");
+  auto span2 = tracer->StartSpan("test2");
   sleep(2);
   span2->SetStatus(trace::StatusCode::kOk);
   sleep(1);

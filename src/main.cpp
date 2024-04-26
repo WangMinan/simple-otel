@@ -16,7 +16,7 @@ void initTrace() {
   auto exporter = std::make_unique<trace::OstreamSpanExporter>();
   auto processor =
       std::make_unique<trace::SimpleSpanProcessor>(std::move(exporter));
-  trace::TraceProvider::InitProvider(std::move(processor));
+  trace::TraceProvider::InitProvider(std::move(processor), "server");
 }
 
 void initPostTrace() {
@@ -24,19 +24,19 @@ void initPostTrace() {
   auto sampler = std::make_unique<trace::TailSampler>(3);
   auto processor = std::make_unique<trace::PostSampleProcessor>(
       std::move(exporter), std::move(sampler));
-  trace::TraceProvider::InitProvider(std::move(processor));
+  trace::TraceProvider::InitProvider(std::move(processor), "server");
 }
 
 int main(int argc, char const *argv[]) {
   initTrace();
   auto trace = trace::TraceProvider::GetTrace();
-  auto span1 = trace->StartSpan("outer", "f1");
+  auto span1 = trace->StartSpan("outer" );
   std::cout << span1->GetId() << std::endl;
-  auto span2 = trace->StartSpan("inner", "f2");
+  auto span2 = trace->StartSpan("inner");
   std::cout << span2->GetId() << std::endl;
   std::cout << trace::Context::GetCurrentContext().GetSpanId() << std::endl;
   std::cout << trace::Context::GetParentContext().GetSpanId() << std::endl;
-  auto span3 = trace->StartSpan("inner-inner", "f3");
+  auto span3 = trace->StartSpan("inner-inner");
   usleep(1000 * 1000);
   span3->SetStatus(trace::StatusCode::kOk);
   span3->End();

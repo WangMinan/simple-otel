@@ -3,7 +3,7 @@
 
 #ifndef LOG_OSTREAM_LOG_EXPORTER_H
 #define LOG_OSTREAM_LOG_EXPORTER_H
-namespace nlog {
+namespace logger {
 class OstreamLogExporter : public LogExporter {
 private:
   std::ostream &sout;
@@ -15,6 +15,6 @@ public:
   
 };
 
-} // namespace nlog
+} // namespace logger
 
 #endif // !LOG_OSTREAM_LOG_EXPORTER_H

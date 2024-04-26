@@ -5,8 +5,7 @@
 
 namespace trace {
 
-std::shared_ptr<Span> Trace::StartSpan(std::string name,
-                                       std::string service_name) {
+std::shared_ptr<Span> Trace::StartSpan(std::string name) {
 
   // 获取当前span的上下文，它将成为新span的父span
   SpanContext &parent_context = Context::GetCurrentContext();
@@ -23,7 +22,7 @@ std::shared_ptr<Span> Trace::StartSpan(std::string name,
   if (parent_context.IsValid()) {
     parent_id = parent_context.GetSpanId();
   }
-  auto span = std::make_shared<Span>(name, service_name, this->trace_id,
+  auto span = std::make_shared<Span>(name, this->service_name, this->trace_id,
                                      parent_id, this->context);
   Context::Attach(span->GetTraceId(), span->GetId(), result.GetTraceFlag(),
                   span->GetTraceContext()->GetSampler().Clone());

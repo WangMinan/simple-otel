@@ -1,16 +1,20 @@
 
 #include "ostream_span_exporter.h"
+#include "../log/logger_factory.h"
 #include "span.h"
 #include "span_exporter.h"
 #include "span_metadata.h"
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 namespace trace {
+
 std::string printTags(std::unordered_map<std::string, std::string> &tags);
 std::string printStatus(StatusCode status);
 
 void OstreamSpanExporter::Export(SpanRecord &span) {
+  log->Info("export span");
   sout << "{"
        << "\n  \"trace_id\": \"" << span.trace_id << "\","
        << "\n  \"span_id\": \"" << span.id << "\","

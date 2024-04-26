@@ -10,6 +10,7 @@
 using arktouros::proto::collector::v1::SpanRequest;
 
 using arktouros::proto::collector::v1::SpanResponse;
+using arktouros::proto::common::v1::SourceType;
 namespace trace {
 
 void BuildProtoSpan(arktouros::proto::span::v1::Span *new_span,
@@ -22,6 +23,7 @@ void BuildProtoSpan(arktouros::proto::span::v1::Span *new_span,
   new_span->set_start_time(span.start_time);
   new_span->set_service_name(span.service_name);
   new_span->set_root(span.parent_id.empty());
+  new_span->set_type(SourceType::SPAN);
   for (auto &tag : span.tags) {
     auto new_tag = new_span->add_tags();
     new_tag->set_key(tag.first);

@@ -3,24 +3,24 @@ package arktouros.proto.collector.v1;
 
 option java_multiple_files = true;
 option java_package = "edu.npu.arktouros.proto.collector.v1";
-option java_outer_classname = "SpanServiceProto";
+option java_outer_classname = "LogServiceProto";
 
-import "model/span.proto";
+import "model/log.proto";
 
-service SpanService {
-  rpc Export(SpanRequest) returns (SpanResponse);
+service LogService {
+  rpc Export(LogRequest) returns (LogResponse);
 }
 
-message SpanRequest {
-  repeated arktouros.proto.span.v1.Span spans = 1;
+message LogRequest {
+  repeated arktouros.proto.log.v1.Log logs = 1;
 }
 
-message SpanResponse {
+message LogResponse {
   // The number of rejected log records.
   //
   // A `rejected_<signal>` field holding a `0` value indicates that the
   // request was fully accepted.
-  int64 rejected_span_records = 1;
+  int64 rejected_log_records = 1;
 
   // A developer-facing human-readable message in English. It should be used
   // either to explain why the server rejected parts of the data during a partial

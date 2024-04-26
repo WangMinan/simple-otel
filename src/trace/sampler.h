@@ -37,6 +37,7 @@ public:
   virtual ~Sampler() = default;
   virtual std::unique_ptr<Sampler> Clone() = 0;
   virtual std::string Serialize() = 0;
+  virtual bool IsPostSampler() { return false; }
 };
 
 } // namespace trace

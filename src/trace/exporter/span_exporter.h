@@ -2,7 +2,6 @@
 #ifndef TRACE_SPAN_EXPORTER_H
 #define TRACE_SPAN_EXPORTER_H
 
-#include <initializer_list>
 #include <stdexcept>
 #include <vector>
 namespace trace {

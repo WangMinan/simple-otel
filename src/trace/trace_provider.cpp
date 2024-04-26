@@ -1,5 +1,6 @@
 
 #include "trace_provider.h"
+#include "processor/post_sample_processor.h"
 #include <memory>
 
 namespace trace {
@@ -27,11 +28,19 @@ std::shared_ptr<Trace> TraceProvider::GetTrace() {
   // use provider's context
   if (!parent_context.IsValid()) {
     auto trace = std::make_shared<Trace>(provider.context);
-
+    provider.traces.emplace(trace->GetId(), trace);
     return trace;
+  } else if (provider.traces.find(parent_context.GetTraceId()) !=
+             provider.traces.end()) {
+    return provider.traces[parent_context.GetTraceId()];
   } else {
-    auto context = std::make_shared<TraceContext>(
-        provider.context->Processor(), parent_context.GetSampler()->Clone());
+    std::shared_ptr<TraceContext> context;
+    if (parent_context.GetSampler()->IsPostSampler()) {
+      context = std::make_shared<TraceContext>(
+          std::make_shared<PostSampleProcessor>(parent_context.GetSampler()->Clone()), parent_context.GetSampler()->Clone());
+    } else {
+      context = std::make_shared<TraceContext>(provider.context->Processor(), parent_context.GetSampler()->Clone());
+    }
     auto trace = std::make_shared<Trace>(parent_context.GetTraceId(), context);
     return trace;
   }

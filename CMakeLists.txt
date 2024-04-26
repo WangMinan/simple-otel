@@ -56,26 +56,13 @@ aux_source_directory(src/protocol SRC_LIST)
 aux_source_directory(src/log SRC_LIST)
 aux_source_directory(src/trace/exporter SRC_LIST)
 aux_source_directory(src/trace/processor SRC_LIST)
-add_executable(simple-otel src/main.cpp ${SRC_LIST})
-add_executable(server src/server.cpp ${SRC_LIST})
-add_executable(client src/client.cpp ${SRC_LIST})
-add_executable(test test/main.cpp ${SRC_LIST})
-target_link_libraries(simple-otel Boost::system Boost::filesystem fmt::fmt ${PROTO_LIBS} ${_REFLECTION}
-    ${_GRPC_GRPCPP}
-    ${_PROTOBUF_LIBPROTOBUF}
-    )
-target_link_libraries(server Boost::system Boost::filesystem fmt::fmt ${PROTO_LIBS} ${_REFLECTION}
-    ${_GRPC_GRPCPP}
-    ${_PROTOBUF_LIBPROTOBUF}
-    )
-target_link_libraries(client Boost::system Boost::filesystem fmt::fmt ${PROTO_LIBS} ${_REFLECTION}
-    ${_GRPC_GRPCPP}
-    ${_PROTOBUF_LIBPROTOBUF}
-    )
-  
-target_link_libraries(test Boost::system Boost::filesystem fmt::fmt ${PROTO_LIBS} ${_REFLECTION}
-    ${_GRPC_GRPCPP}
-    ${_PROTOBUF_LIBPROTOBUF}
-    )
 
-# target_link_libraries(simple-otel trace)
+foreach(_target client server main)
+    add_executable(${_target} "src/${_target}.cpp" ${SRC_LIST}) 
+    target_link_libraries(${_target} Boost::system Boost::filesystem fmt::fmt ${PROTO_LIBS} ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+endforeach()
+
+foreach(_target grpc_span_exporter_test)
+    add_executable(${_target} "test/${_target}.cpp" ${SRC_LIST}) 
+    target_link_libraries(${_target} Boost::system Boost::filesystem fmt::fmt ${PROTO_LIBS} ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+endforeach(_target )

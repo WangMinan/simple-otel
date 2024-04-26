@@ -1,3 +1,6 @@
+
+#ifndef TRACE_GRPC_SPAN_EXPORTER_H
+#define TRACE_GRPC_SPAN_EXPORTER_H
 #include "collector/span_service.grpc.pb.h"
 #include "span.h"
 #include <grpcpp/grpcpp.h>
@@ -42,3 +45,5 @@ public:
   void Export(std::vector<SpanRecord> &records) override;
 };
 } // namespace trace
+
+#endif // !TRACE_GRPC_SPAN_EXPORTER_H

@@ -1,12 +1,13 @@
 
 #include <initializer_list>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
 #ifndef LOG_RECORD_H
 #define LOG_RECORD_H
-namespace nlog {
+namespace logger {
 enum LogLevel { DEBUG, INFO, WARN, ERROR };
 
 class LogRecord {
@@ -39,9 +40,37 @@ public:
   long GetTimestamp() { return this->timestamp; }
   std::unordered_map<std::string, std::string> GetTags() { return this->tags; }
   LogLevel GetLogLevel() { return this->level; }
+  bool GetError() { return this->error; }
 
   ~LogRecord() = default;
 };
 
-} // namespace nlog
+inline std::string printLogLevel(LogLevel level) {
+  switch (level) {
+  case LogLevel::DEBUG:
+    return "DEBUG";
+  case LogLevel::INFO:
+    return "INFO";
+  case LogLevel::WARN:
+    return "WARN";
+  case LogLevel::ERROR:
+    return "ERROR";
+  };
+  throw std::runtime_error("invalid log level");
+}
+
+inline std::string printTags(std::unordered_map<std::string, std::string> &tags) {
+  std::string tags_str = "{";
+  for (auto &tag : tags) {
+    tags_str += "\"" + tag.first + "\": \"" + tag.second + "\",";
+  }
+  tags_str += "}";
+  return tags_str;
+}
+
+inline std::string printError(bool error) {
+  return error ? "true" : "false";
+}
+
+} // namespace logger
 #endif // !LOG_H

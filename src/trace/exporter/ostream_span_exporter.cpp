@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 namespace trace {
+
 std::string printTags(std::unordered_map<std::string, std::string> &tags);
 std::string printStatus(StatusCode status);
 

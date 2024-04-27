@@ -1,8 +1,11 @@
 #ifndef TRACE_OSTREAM_EXPORTER_H
 #define TRACE_OSTREAM_EXPORTER_H
 
+#include "../log/logger.h"
+#include "logger_factory.h"
 #include "span_exporter.h"
 #include <iostream>
+#include <memory>
 #include <ostream>
 #include <vector>
 

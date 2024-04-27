@@ -21,7 +21,7 @@ void initPostTrace() {
   auto sampler = std::make_unique<trace::TailSampler>(3);
   auto processor = std::make_unique<trace::PostSampleProcessor>(
       std::move(exporter), std::move(sampler));
-  trace::TraceProvider::InitProvider(std::move(processor));
+  trace::TraceProvider::InitProvider(std::move(processor), "client");
 }
 
 int main() {
@@ -43,7 +43,7 @@ int main() {
   protocol::Message msg;
   auto trace = trace::TraceProvider::GetTrace();
   trace::SpanContext context;
-  auto span = trace->StartSpan("client", "client");
+  auto span = trace->StartSpan("client");
   trace::Context::WriteToMessage(msg);
   std::string message = msg.Serialize().c_str();
 
@@ -67,5 +67,5 @@ void initTrace() {
   auto exporter = std::make_unique<trace::OstreamSpanExporter>();
   auto processor =
       std::make_unique<trace::SimpleSpanProcessor>(std::move(exporter));
-  trace::TraceProvider::InitProvider(std::move(processor));
+  trace::TraceProvider::InitProvider(std::move(processor), "client");
 }

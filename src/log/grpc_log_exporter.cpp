@@ -2,6 +2,7 @@
 #include "collector/log_service.pb.h"
 #include "common/source_type.pb.h"
 #include <grpcpp/client_context.h>
+#include <vector>
 
 using arktouros::proto::collector::v1::LogRequest;
 using arktouros::proto::collector::v1::LogResponse;
@@ -25,10 +26,13 @@ void BuildProtoLog(arktouros::proto::log::v1::Log *new_log, LogRecord &log) {
   }
 }
 
-LogExportResponse GrpcLogClient::Export(LogRecord &log) {
+LogExportResponse GrpcLogClient::Export(std::vector<LogRecord> &records) {
   LogRequest req;
-  auto new_log = req.add_logs();
-  BuildProtoLog(new_log, log);
+  for (auto record : records) {
+
+    auto new_log = req.add_logs();
+    BuildProtoLog(new_log, record);
+  }
   grpc::ClientContext ctx;
   LogResponse resp;
   auto status = stub->Export(&ctx, req, &resp);
@@ -40,7 +44,15 @@ LogExportResponse GrpcLogClient::Export(LogRecord &log) {
 }
 
 void GrpcLogExporter::Export(LogRecord &log) {
-  auto resp = this->client->Export(log);
+  std::vector<LogRecord> records = std::vector<LogRecord>{log};
+  auto resp = this->client->Export(records);
+  if (!resp.success) {
+    throw std::runtime_error(resp.error_message);
+  }
+}
+
+void GrpcLogExporter::Export(std::vector<LogRecord> &records) {
+  auto resp = this->client->Export(records);
   if (!resp.success) {
     throw std::runtime_error(resp.error_message);
   }

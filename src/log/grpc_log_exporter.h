@@ -6,6 +6,7 @@
 #include "log_record.h"
 #include <grpcpp/channel.h>
 #include <memory>
+#include <vector>
 
 using arktouros::proto::collector::v1::LogService;
 using grpc::Channel;
@@ -26,7 +27,7 @@ public:
       : stub(LogService::NewStub(
             std::static_pointer_cast<grpc::ChannelInterface>(channel))){};
   ~GrpcLogClient() = default;
-  LogExportResponse Export(LogRecord &log);
+  LogExportResponse Export(std::vector<LogRecord> &log);
 };
 
 class GrpcLogExporter : public LogExporter {
@@ -38,6 +39,7 @@ public:
       : client(std::make_unique<GrpcLogClient>(channel)){};
   ~GrpcLogExporter() = default;
   void Export(LogRecord &log) override;
+  void Export(std::vector<LogRecord> &records) override;
 };
 
 } // namespace logger

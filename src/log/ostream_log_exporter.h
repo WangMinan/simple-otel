@@ -12,7 +12,7 @@ public:
   OstreamLogExporter(std::ostream &sout_ = std::cout) : sout(sout_){};
   ~OstreamLogExporter() = default;
   void Export(LogRecord &log_record) override;
-  
+  void Export(std::vector<LogRecord> &records) override; 
 };
 
 } // namespace logger

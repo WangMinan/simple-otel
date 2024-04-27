@@ -13,13 +13,9 @@ namespace trace {
 class OstreamSpanExporter : public SpanExporter {
 private:
   std::ostream &sout;
-  const std::unique_ptr<logger::Logger> log;
 
 public:
-  OstreamSpanExporter(
-      std::ostream &sout_ = std::cout,
-      std::unique_ptr<logger::Logger> &&log_ = logger::LoggerFactory::Create())
-      : sout(sout_), log(std::move(log_)){};
+  OstreamSpanExporter(std::ostream &sout_ = std::cout) : sout(sout_){};
   ~OstreamSpanExporter() = default;
   void Export(SpanRecord &record) override;
   void Export(std::vector<SpanRecord> &records) override;

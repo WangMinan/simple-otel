@@ -3,7 +3,6 @@
 #include "protocol/message.h"
 #include "sampler/tail_sampler.h"
 #include "span_context.h"
-#include "trace/trace.h"
 #include "trace_provider.h"
 #include <iostream>
 #include <memory>
@@ -12,15 +11,17 @@
 #include <string>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <utility>
 
 void initTrace();
 
 void initPostTrace() {
   auto exporter = std::make_unique<trace::OstreamSpanExporter>();
   auto sampler = std::make_unique<trace::TailSampler>(3);
-  auto processor = std::make_unique<trace::PostSampleProcessor>(
-      std::move(exporter), std::move(sampler));
-  trace::TraceProvider::InitProvider(std::move(processor), "server");
+  auto processor =
+      std::make_unique<trace::PostSampleProcessor>(std::move(exporter));
+  trace::TraceProvider::InitProvider(std::move(processor), "server",
+                                     std::move(sampler));
 }
 
 int main(int argc, char const *argv[]) {
@@ -48,7 +49,7 @@ int main(int argc, char const *argv[]) {
     auto span = tracer->StartSpan("server");
 
     try {
-      throw std::runtime_error("error");
+      // throw std::runtime_error("error");
     } catch (const std::exception &e) {
       span->SetStatus(trace::StatusCode::kError);
       trace::Context::SetTraceFlag(TraceFlag::kIsSampled);
@@ -60,10 +61,13 @@ int main(int argc, char const *argv[]) {
       return 0;
     }
 
-    write(clientSocket, buf, len);
-
     span->SetStatus(trace::StatusCode::kOk);
     span->End();
+    auto return_context = trace::Context::GetReturnContext();
+    auto return_msg = return_context.ToMessage();
+    auto return_str = return_msg.Serialize();
+    write(clientSocket, return_str.c_str(), len);
+
     close(clientSocket);
   }
 

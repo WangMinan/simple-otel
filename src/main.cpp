@@ -3,9 +3,7 @@
 #include "sampler/tail_sampler.h"
 #include "span_context.h"
 #include "span_metadata.h"
-#include "trace/trace.h"
 #include "trace_provider.h"
-#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <ostream>
@@ -23,7 +21,7 @@ void initPostTrace() {
   auto exporter = std::make_unique<trace::OstreamSpanExporter>();
   auto sampler = std::make_unique<trace::TailSampler>(3);
   auto processor = std::make_unique<trace::PostSampleProcessor>(
-      std::move(exporter), std::move(sampler));
+      std::move(exporter));
   trace::TraceProvider::InitProvider(std::move(processor), "server");
 }
 

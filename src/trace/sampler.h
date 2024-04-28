@@ -3,15 +3,16 @@
 #include "trace_metadata.h"
 #include <memory>
 #include <string>
+#include <unordered_map>
 namespace trace {
 
 class SpanContext;
 
 enum class SampleStrategy {
   kAlwaysSample = 0,
-  kNeverSample = 1,
-  kRandomSample = 2,
-  kTailSample = 3
+  kRandomSample = 1,
+  kTailSample = 2,
+  kHeadVariantSample = 3,
 };
 
 class SampleResult {
@@ -38,6 +39,8 @@ public:
   virtual std::unique_ptr<Sampler> Clone() = 0;
   virtual std::string Serialize() = 0;
   virtual bool IsPostSampler() { return false; }
+  virtual SampleStrategy GetSampleStrategy() = 0;
+  virtual std::unordered_map<std::string, std::string> GetAttributes() = 0;
 };
 
 } // namespace trace

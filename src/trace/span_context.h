@@ -7,6 +7,7 @@
 #include "trace_metadata.h"
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 namespace trace {
 class Span;
@@ -15,17 +16,18 @@ private:
   std::string trace_id;
   std::string span_id;
   TraceFlag trace_flag;
-  std::shared_ptr<Sampler> sampler;
+  SampleStrategy sample_strategy;
+  std::unordered_map<std::string, std::string> attributes;
 
 public:
   friend class Context;
   SpanContext() = default;
-  SpanContext(
-      std::string trace_id_, std::string span_id_,
-      TraceFlag trace_flag_ = kIsSampled,
-      std::shared_ptr<Sampler> &&sampler_ = std::make_shared<AlwaysOnSampler>())
+  SpanContext(std::string trace_id_, std::string span_id_,
+              std::unordered_map<std::string, std::string> attributes_ = {},
+              TraceFlag trace_flag_ = kIsSampled,
+              SampleStrategy sample_strategy_ = SampleStrategy::kAlwaysSample)
       : trace_id(trace_id_), span_id(span_id_), trace_flag(trace_flag_),
-        sampler(sampler_){};
+        sample_strategy(sample_strategy_), attributes(attributes_){};
   ~SpanContext() = default;
   SpanContext(SpanContext &&other) = default;
   SpanContext &operator=(SpanContext &&other) = default;
@@ -33,7 +35,10 @@ public:
   std::string GetTraceId() { return this->trace_id; };
   std::string GetSpanId() { return this->span_id; }
   TraceFlag GetTraceFlag() { return this->trace_flag; }
-  std::shared_ptr<Sampler> GetSampler() { return this->sampler; }
+  SampleStrategy GetSampleStrategy() { return this->sample_strategy; }
+  std::unordered_map<std::string, std::string> &GetAttributes() {
+    return this->attributes;
+  }
 };
 
 /// @brief thread local span context
@@ -72,9 +77,9 @@ public:
   /// @param trace_id
   /// @param span_id
   /// @param trace_flag
-  /// @param sampler
   static void Attach(std::string trace_id, std::string span_id,
-                     TraceFlag trace_flag, std::shared_ptr<Sampler> &&sampler);
+                     std::unordered_map<std::string, std::string> attributes,
+                     TraceFlag trace_flag, SampleStrategy strategy);
 
   /// @brief detach the current span context
   static void Detach();

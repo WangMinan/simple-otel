@@ -13,15 +13,17 @@
 #include <string>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <utility>
 
 void initTrace();
 
 void initPostTrace() {
   auto exporter = std::make_unique<trace::OstreamSpanExporter>();
   auto sampler = std::make_unique<trace::TailSampler>(3);
-  auto processor = std::make_unique<trace::PostSampleProcessor>(
-      std::move(exporter), std::move(sampler));
-  trace::TraceProvider::InitProvider(std::move(processor), "client");
+  auto processor =
+      std::make_unique<trace::PostSampleProcessor>(std::move(exporter));
+  trace::TraceProvider::InitProvider(std::move(processor), "client",
+                                     std::move(sampler));
 }
 
 int main() {

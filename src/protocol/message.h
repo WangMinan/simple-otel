@@ -23,6 +23,7 @@ namespace protocol
         void SetHeader(std::string key, std::string value);
         void RemoveHeader(std::string key);
         std::string GetHeader(std::string key);
+        std::unordered_map<std::string, std::string>& GetHeaders();
     };
 
 } // namespace protocol

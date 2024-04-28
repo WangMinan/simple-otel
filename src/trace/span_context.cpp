@@ -1,17 +1,10 @@
 #include "span_context.h"
 #include "sampler.h"
+#include <algorithm>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
-
-std::shared_ptr<trace::Sampler> getSampler(std::string sampler) {
-  switch (atoi(sampler.c_str())) {
-  case 0:
-    return std::make_shared<trace::AlwaysOnSampler>();
-  default:
-    return std::make_shared<trace::AlwaysOnSampler>();
-  }
-}
 
 namespace trace {
 
@@ -25,17 +18,28 @@ thread_local std::unique_ptr<RespContext> Context::return_context;
 bool SpanContext::IsValid() { return !trace_id.empty() && !span_id.empty(); }
 
 void Context::Extract(protocol::Message message) {
+  static const std::vector<std::string> reserved_keys = {
+      "trace_id", "span_id", "trace_flag", "sample_strategy"};
   auto trace_id = message.GetHeader("trace_id");
   auto span_id = message.GetHeader("span_id");
   auto trace_flag = message.GetHeader("trace_flag");
-  auto sampler = message.GetHeader("sampler");
+  auto sample_strategy =
+      std::atoi(message.GetHeader("sample_strategy").c_str());
+  std::unordered_map<std::string, std::string> attributes_;
+  for (auto &[key, value] : message.GetHeaders()) {
+    if (std::find(reserved_keys.begin(), reserved_keys.end(), key) !=
+        reserved_keys.end()) {
+      continue;
+    }
+    attributes_.emplace(key, value);
+  }
   if (trace_id.empty()) {
 
-    parent_context = SpanContext(trace_id, span_id);
+    parent_context = SpanContext(trace_id, span_id, attributes_);
   } else {
-    parent_context = SpanContext(trace_id, span_id,
+    parent_context = SpanContext(trace_id, span_id, attributes_,
                                  TraceFlagHandler::GetTraceFlag(trace_flag),
-                                 getSampler(sampler));
+                                 static_cast<SampleStrategy>(sample_strategy));
   }
 }
 
@@ -65,13 +69,18 @@ void Context::WriteToMessage(protocol::Message &message) {
   message.SetHeader("span_id", current_context.span_id);
   message.SetHeader("trace_flag", TraceFlagHandler::Serialize(
                                       current_context.GetTraceFlag()));
-  message.SetHeader("sampler", current_context.GetSampler()->Serialize());
+  message.SetHeader("sample_strategy", std::to_string(static_cast<int>(
+                                           current_context.sample_strategy)));
+  for (auto &[key, value] : current_context.attributes) {
+    message.SetHeader(key, value);
+  }
 }
 
 void Context::Attach(std::string trace_id, std::string span_id,
-                     TraceFlag trace_flag, std::shared_ptr<Sampler> &&sampler) {
-  current_contexts.emplace_back(trace_id, span_id, trace_flag,
-                                std::move(sampler));
+                     std::unordered_map<std::string, std::string> attributes,
+                     TraceFlag trace_flag, SampleStrategy sample_strategy) {
+  current_contexts.emplace_back(trace_id, span_id, attributes, trace_flag,
+                                sample_strategy);
 }
 
 void Context::Detach() {

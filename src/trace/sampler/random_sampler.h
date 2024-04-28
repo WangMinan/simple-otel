@@ -4,7 +4,10 @@
 #include <memory>
 #include <stdlib.h>
 #include <string>
+#include <unordered_map>
 
+#ifndef TRACE_RANDOM_SAMPLER_H
+#define TRACE_RANDOM_SAMPLER_H
 namespace trace {
 class RandomSampler : public Sampler {
 private:
@@ -23,6 +26,8 @@ public:
   std::string Serialize() override {
     return std::to_string(static_cast<int>(SampleStrategy::kRandomSample));
   }
+  SampleStrategy GetSampleStrategy() override;
+  std::unordered_map<std::string, std::string> GetAttributes() override;
 };
 
 inline SampleResult RandomSampler::ShouldSampled(SpanContext &context) {
@@ -40,4 +45,15 @@ inline SampleResult RandomSampler::ShouldSampled(SpanContext &context) {
                                  : TraceFlag::kIsDiscarded);
 }
 
+inline SampleStrategy RandomSampler::GetSampleStrategy() {
+  return SampleStrategy::kRandomSample;
+}
+
+inline std::unordered_map<std::string, std::string>
+RandomSampler::GetAttributes() {
+  return {{"rate", std::to_string(rate)}};
+}
+
 } // namespace trace
+
+#endif // !TRACE_RANDOM_SAMPLER_H

@@ -8,12 +8,9 @@
 namespace trace {
 class PostSampleProcessor : public SpanProcessor {
 private:
-  std::unique_ptr<PostSampler> sampler;
-
 public:
-  PostSampleProcessor(std::unique_ptr<SpanExporter> &&exporter_,
-                      std::unique_ptr<PostSampler> &&sampler_)
-      : SpanProcessor(std::move(exporter_)), sampler(std::move(sampler_)){};
+  PostSampleProcessor(std::unique_ptr<SpanExporter> &&exporter_)
+      : SpanProcessor(std::move(exporter_)){};
   ~PostSampleProcessor() = default;
   void OnStart(Span &span) override;
   void OnEnd(Span &span) override;

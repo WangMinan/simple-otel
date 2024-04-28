@@ -1,6 +1,7 @@
 #include "post_sampler.h"
 #include "span_context.h"
 #include "trace_metadata.h"
+#include <cstdlib>
 
 #ifndef TRACE_TAIL_SAMPLER_H
 #define TRACE_TAIL_SAMPLER_H
@@ -51,12 +52,20 @@ public:
   }
 
   std::unique_ptr<Sampler> Clone() override {
-    return std::make_unique<TailSampler>(rate);
+    return std::make_unique<TailSampler>(this->rate);
   }
 
   // TODO: Serialize
   std::string Serialize() override {
     return std::to_string(static_cast<int>(SampleStrategy::kTailSample));
+  }
+
+  SampleStrategy GetSampleStrategy() override {
+    return SampleStrategy::kTailSample;
+  }
+
+  std::unordered_map<std::string, std::string> GetAttributes() override {
+    return {{"rate", std::to_string(rate)}};
   }
 };
 

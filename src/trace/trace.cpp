@@ -2,6 +2,7 @@
 #include "span_context.h"
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace trace {
 
@@ -12,20 +13,25 @@ std::shared_ptr<Span> Trace::StartSpan(std::string name) {
   auto result = this->context->GetSampler().ShouldSampled(parent_context);
   if (!result.ShouldSample() &&
       result.GetTraceFlag() != TraceFlag::kIsWaiting) {
-    Context::Attach(this->trace_id, "", result.GetTraceFlag(),
-                    parent_context.GetSampler()->Clone());
+    Context::Attach(this->trace_id, "", {}, result.GetTraceFlag(),
+                    this->context->GetSampler().GetSampleStrategy());
     return std::make_shared<NoopSpan>();
   }
   std::string parent_id;
+  std::unordered_map<std::string, std::string> attributes;
   // 如果没有span，尝试从上下文中获取父span
   // 否则为root span
   if (parent_context.IsValid()) {
     parent_id = parent_context.GetSpanId();
+    attributes = parent_context.GetAttributes();
+  } else {
+    attributes = this->context->GetSampler().GetAttributes();
   }
   auto span = std::make_shared<Span>(name, this->service_name, this->trace_id,
                                      parent_id, this->context);
-  Context::Attach(span->GetTraceId(), span->GetId(), result.GetTraceFlag(),
-                  span->GetTraceContext()->GetSampler().Clone());
+  Context::Attach(span->GetTraceId(), span->GetId(), attributes,
+                  result.GetTraceFlag(),
+                  this->context->GetSampler().GetSampleStrategy());
   Context::AddActiveSpan(span);
   return span;
 }

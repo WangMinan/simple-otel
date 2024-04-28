@@ -1,8 +1,8 @@
 #include "exporter/grpc_span_exporter.h"
-#include "grpc_log_exporter.h"
+#include "exporter/grpc_log_exporter.h"
 #include "logger_factory.h"
 #include "processor/batch_span_processor.h"
-#include "simple_log_processor.h"
+#include "processor/simple_log_processor.h"
 #include "span_metadata.h"
 #include "trace_provider.h"
 #include <arpa/inet.h>

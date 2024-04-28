@@ -1,7 +1,7 @@
 #ifndef LOGGER_LOG_PROCESSOR_H
 #define LOGGER_LOG_PROCESSOR_H
 
-#include "log_exporter.h"
+#include "exporter/log_exporter.h"
 #include <memory>
 #include <utility>
 namespace logger {

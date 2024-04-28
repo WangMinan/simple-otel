@@ -57,6 +57,8 @@ aux_source_directory(src/log SRC_LIST)
 aux_source_directory(src/trace/exporter SRC_LIST)
 aux_source_directory(src/trace/processor SRC_LIST)
 aux_source_directory(src/common SRC_LIST)
+aux_source_directory(src/log/processor SRC_LIST)
+aux_source_directory(src/log/exporter SRC_LIST)
 
 foreach(_target client server main)
     add_executable(${_target} "src/${_target}.cpp" ${SRC_LIST}) 

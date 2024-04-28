@@ -2,8 +2,6 @@
 #ifndef TRACE_GRPC_SPAN_EXPORTER_H
 #define TRACE_GRPC_SPAN_EXPORTER_H
 #include "collector/span_service.grpc.pb.h"
-#include "logger.h"
-#include "logger_factory.h"
 #include "span.h"
 #include <grpcpp/grpcpp.h>
 #include <memory>
@@ -37,9 +35,7 @@ private:
   std::unique_ptr<GrpcSpanClient> client;
 
 public:
-  GrpcSpanExporter(
-      std::shared_ptr<Channel> channel,
-      std::unique_ptr<logger::Logger> &&log_ = logger::LoggerFactory::Create())
+  GrpcSpanExporter(std::shared_ptr<Channel> channel)
       : client(std::make_unique<GrpcSpanClient>(channel)){};
 
   ~GrpcSpanExporter() = default;

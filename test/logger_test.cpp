@@ -1,9 +1,9 @@
 
 #include "exporter/ostream_span_exporter.h"
 #include "logger_factory.h"
-#include "ostream_log_exporter.h"
+#include "exporter/ostream_log_exporter.h"
 #include "processor/span_processor.h"
-#include "simple_log_processor.h"
+#include "processor/simple_log_processor.h"
 #include "span_metadata.h"
 #include "trace_provider.h"
 #include <memory>

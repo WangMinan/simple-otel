@@ -1,5 +1,5 @@
-#include "log_exporter.h"
-#include "log_processor.h"
+#include "exporter/log_exporter.h"
+#include "processor/log_processor.h"
 #include <initializer_list>
 #include <memory>
 #include <string>

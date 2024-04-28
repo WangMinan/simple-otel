@@ -10,7 +10,7 @@
 #include <memory>
 #include <ostream>
 
-#include "log/ostream_log_exporter.h"
+#include "exporter/ostream_log_exporter.h"
 #include <unistd.h>
 void initTrace() {
   auto exporter = std::make_unique<trace::OstreamSpanExporter>();

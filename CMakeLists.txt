@@ -49,9 +49,9 @@ find_package(Boost REQUIRED COMPONENTS system filesystem)
 find_package(fmt)
 
 include_directories("${GENERATED_DIR}")
-include_directories(src/trace src/utils src/protocl src/log src/common)
+include_directories(src/trace src/utils src/protocl src/log src/common src/metric)
 
-foreach(SRC trace utils protocol log trace/exporter trace/processor trace/sampler log/processor log/exporter common)
+foreach(SRC trace utils protocol log trace/exporter trace/processor trace/sampler log/processor log/exporter common metric)
    aux_source_directory(src/${SRC} SRC_LIST) 
 endforeach()
 
@@ -60,7 +60,7 @@ foreach(_target client server main)
     target_link_libraries(${_target} Boost::system Boost::filesystem fmt::fmt ${PROTO_LIBS} ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
 endforeach()
 
-foreach(_target grpc_span_exporter_test logger_test period_task_test)
+foreach(_target grpc_span_exporter_test logger_test period_task_test metric_collector_test)
     add_executable(${_target} "test/${_target}.cpp" ${SRC_LIST}) 
     target_link_libraries(${_target} Boost::system Boost::filesystem fmt::fmt ${PROTO_LIBS} ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
 endforeach(_target )

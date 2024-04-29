@@ -1,4 +1,5 @@
 #include "metric_collector.h"
+#include "timestamp_generator.h"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -22,18 +23,16 @@ void MetricsCollector::start() {
   collectingThread = std::thread([this] {
     while (true) {
       std::this_thread::sleep_for(std::chrono::seconds(this->intervalSeconds));
-      double cpuUsage = this->collectCpuUsage();
-      auto [totalMemory, availableMemory] = this->collectMemoryUsage();
-      std::cout << "CPU Usage: " << cpuUsage << "%" << std::endl;
-      std::cout << "Memory Usage: " << availableMemory << "/" << totalMemory
-                << std::endl;
+      CpuMetricRecord cpuUsage = this->collectCpuUsage();
+      MemoryMetricRecord memory = this->collectMemoryUsage();
+      exporter->Export({&cpuUsage, &memory});
     }
   });
   collectingThread.detach();
   created = true;
 }
 
-double MetricsCollector::collectCpuUsage() {
+CpuMetricRecord MetricsCollector::collectCpuUsage() {
   std::ifstream proc_stat("/proc/stat");
   std::string cpu;
   long long int user, nice, system, idle, iowait, irq, softirq, steal, guest,
@@ -56,9 +55,10 @@ double MetricsCollector::collectCpuUsage() {
   long int totald = Total - PrevTotal;
   long int idled = Idle - PrevIdle;
   double CPU_Percentage = (double)(totald - idled) / totald * 100;
-  return CPU_Percentage;
+  return CpuMetricRecord("cpu", this->service_name, "cpu usage",
+                         utils::TimestampGenerator::Now(), CPU_Percentage);
 }
-std::pair<uint64_t, uint64_t> MetricsCollector::collectMemoryUsage() {
+MemoryMetricRecord MetricsCollector::collectMemoryUsage() {
   std::ifstream meminfo("/proc/meminfo");
   std::uint64_t totalMemory = 0, availableMemory = 0;
   std::string line;
@@ -68,6 +68,8 @@ std::pair<uint64_t, uint64_t> MetricsCollector::collectMemoryUsage() {
     else if (line.find("MemAvailable:") == 0)
       sscanf(line.c_str(), "%*s%lu", &availableMemory);
   }
-  return std::make_pair(totalMemory, availableMemory);
+  return MemoryMetricRecord("memory", this->service_name, "memory usage",
+                            utils::TimestampGenerator::Now(), availableMemory,
+                            availableMemory, totalMemory);
 }
 } // namespace metric

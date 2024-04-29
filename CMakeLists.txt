@@ -51,7 +51,7 @@ find_package(fmt)
 include_directories("${GENERATED_DIR}")
 include_directories(src/trace src/utils src/protocl src/log src/common src/metric)
 
-foreach(SRC trace utils protocol log trace/exporter trace/processor trace/sampler log/processor log/exporter common metric)
+foreach(SRC trace utils protocol log trace/exporter trace/processor trace/sampler log/processor log/exporter common metric metric/exporter)
    aux_source_directory(src/${SRC} SRC_LIST) 
 endforeach()
 

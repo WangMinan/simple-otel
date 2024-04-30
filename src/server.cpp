@@ -1,6 +1,7 @@
 #include "exporter/ostream_span_exporter.h"
 #include "processor/post_sample_processor.h"
 #include "protocol/message.h"
+#include "sampler/head_variant_sampler.h"
 #include "sampler/tail_sampler.h"
 #include "span_context.h"
 #include "trace_provider.h"
@@ -15,6 +16,15 @@
 
 void initTrace();
 
+void initHeadVariantTrace() {
+
+  auto exporter = std::make_unique<trace::OstreamSpanExporter>();
+  auto sampler = std::make_unique<trace::HeadVariantSampler>(1, 3);
+  auto processor =
+      std::make_unique<trace::PostSampleProcessor>(std::move(exporter));
+  trace::TraceProvider::InitProvider(std::move(processor), "client",
+                                     std::move(sampler));
+}
 void initPostTrace() {
   auto exporter = std::make_unique<trace::OstreamSpanExporter>();
   auto sampler = std::make_unique<trace::TailSampler>(3);
@@ -25,7 +35,7 @@ void initPostTrace() {
 }
 
 int main(int argc, char const *argv[]) {
-  initPostTrace();
+  initHeadVariantTrace();
   int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
   sockaddr_in addr;
   addr.sin_family = AF_INET;

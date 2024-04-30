@@ -26,6 +26,10 @@ std::shared_ptr<Span> Trace::StartSpan(std::string name) {
     attributes = parent_context.GetAttributes();
   } else {
     attributes = this->context->GetSampler().GetAttributes();
+    // 上面的采样过程可能对上下文进行了修改，这里确保根节点能感知到变化
+    for (auto [key, value] : parent_context.GetAttributes()) {
+      attributes[key] = value;
+    }
   }
   auto span = std::make_shared<Span>(name, this->service_name, this->trace_id,
                                      parent_id, this->context);

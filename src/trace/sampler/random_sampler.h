@@ -22,10 +22,7 @@ public:
   std::unique_ptr<Sampler> Clone() override {
     return std::make_unique<RandomSampler>(rate);
   };
-  // TODO: Serialize
-  std::string Serialize() override {
-    return std::to_string(static_cast<int>(SampleStrategy::kRandomSample));
-  }
+  
   SampleStrategy GetSampleStrategy() override;
   std::unordered_map<std::string, std::string> GetAttributes() override;
 };

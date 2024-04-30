@@ -23,7 +23,6 @@ public:
   PostSample(std::vector<std::shared_ptr<RespContext>> &resp_contexts,
              SpanContext &context) override;
   std::unique_ptr<Sampler> Clone() override; 
-  std::string Serialize() override;
   SampleStrategy GetSampleStrategy() override;
   std::unordered_map<std::string, std::string> GetAttributes() override;
 };

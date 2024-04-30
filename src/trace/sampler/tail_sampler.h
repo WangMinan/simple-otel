@@ -55,10 +55,7 @@ public:
     return std::make_unique<TailSampler>(this->rate);
   }
 
-  // TODO: Serialize
-  std::string Serialize() override {
-    return std::to_string(static_cast<int>(SampleStrategy::kTailSample));
-  }
+  
 
   SampleStrategy GetSampleStrategy() override {
     return SampleStrategy::kTailSample;

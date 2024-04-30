@@ -24,7 +24,7 @@ public:
   SpanContext() = default;
   SpanContext(std::string trace_id_, std::string span_id_,
               std::unordered_map<std::string, std::string> attributes_ = {},
-              TraceFlag trace_flag_ = kIsSampled,
+              TraceFlag trace_flag_ = kIsWaiting,
               SampleStrategy sample_strategy_ = SampleStrategy::kAlwaysSample)
       : trace_id(trace_id_), span_id(span_id_), trace_flag(trace_flag_),
         sample_strategy(sample_strategy_), attributes(attributes_){};

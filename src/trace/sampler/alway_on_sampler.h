@@ -13,7 +13,6 @@ public:
   ~AlwaysOnSampler() = default;
   SampleResult ShouldSampled(SpanContext &context) override;
   std::unique_ptr<Sampler> Clone() override;
-  std::string Serialize() override;
   SampleStrategy GetSampleStrategy() override;
   std::unordered_map<std::string, std::string> GetAttributes() override;
 };
@@ -27,9 +26,6 @@ inline std::unique_ptr<Sampler> AlwaysOnSampler::Clone() {
   return std::make_unique<AlwaysOnSampler>();
 }
 
-inline std::string AlwaysOnSampler::Serialize() {
-  return std::to_string(static_cast<int>(SampleStrategy::kAlwaysSample));
-}
 
 inline SampleStrategy AlwaysOnSampler::GetSampleStrategy() {
   return SampleStrategy::kAlwaysSample;

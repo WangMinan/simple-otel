@@ -3,6 +3,7 @@
 #include "exporter/ostream_span_exporter.h"
 #include "processor/post_sample_processor.h"
 #include "protocol/message.h"
+#include "sampler/head_variant_sampler.h"
 #include "sampler/tail_sampler.h"
 #include "span_context.h"
 #include "span_metadata.h"
@@ -26,8 +27,18 @@ void initPostTrace() {
                                      std::move(sampler));
 }
 
+void initHeadVariantTrace() {
+
+  auto exporter = std::make_unique<trace::OstreamSpanExporter>();
+  auto sampler = std::make_unique<trace::HeadVariantSampler>(1, 3);
+  auto processor =
+      std::make_unique<trace::PostSampleProcessor>(std::move(exporter));
+  trace::TraceProvider::InitProvider(std::move(processor), "client",
+                                     std::move(sampler));
+}
+
 int main() {
-  initPostTrace();
+  initHeadVariantTrace();
   // creating socket
   int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 

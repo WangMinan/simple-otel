@@ -37,7 +37,6 @@ public:
   virtual SampleResult ShouldSampled(SpanContext &context) = 0;
   virtual ~Sampler() = default;
   virtual std::unique_ptr<Sampler> Clone() = 0;
-  virtual std::string Serialize() = 0;
   virtual bool IsPostSampler() { return false; }
   virtual SampleStrategy GetSampleStrategy() = 0;
   virtual std::unordered_map<std::string, std::string> GetAttributes() = 0;

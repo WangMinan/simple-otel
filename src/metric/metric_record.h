@@ -1,4 +1,6 @@
 
+#include "collector/metric_service.pb.h"
+#include "model/metric.pb.h"
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -26,6 +28,8 @@ public:
         timestamp(timestamp_), labels(labels_){};
   ~MetricRecord() = default;
   virtual std::string PrintJson() = 0;
+  virtual void
+  GetProtoMetric(arktouros::proto::collector::v1::Metric *new_metric) = 0;
 };
 
 class CpuMetricRecord : public MetricRecord {
@@ -49,6 +53,22 @@ public:
         << "\n  \"labels\": " << printLabels(labels) << ","
         << "\n  \"cpu_usage\": " << cpu_usage << "\n}";
     return oss.str();
+  };
+
+  void
+  GetProtoMetric(arktouros::proto::collector::v1::Metric *new_metric) override {
+    auto gauge = new_metric->mutable_gauge();
+    gauge->set_value(this->cpu_usage);
+    auto metric = gauge->mutable_metric();
+    metric->set_metric_type(arktouros::proto::metric::v1::MetricType::GAUGE);
+    metric->set_name(this->name);
+    metric->set_service_name(this->service_name);
+    metric->set_description(this->description);
+    metric->set_timestamp(this->timestamp);
+    auto labels_ = metric->mutable_labels();
+    for (auto label : this->labels) {
+      labels_->insert({label.first, label.second});
+    }
   };
 };
 
@@ -84,6 +104,24 @@ public:
         << "\n}";
     return oss.str();
   };
+
+  void
+  GetProtoMetric(arktouros::proto::collector::v1::Metric *new_metric) override {
+    auto histogram = new_metric->mutable_histogram();
+    histogram->set_sample_sum(this->memory_total);
+    histogram->set_sample_count(this->memory_usage);
+
+    auto metric = histogram->mutable_metric();
+    metric->set_metric_type(arktouros::proto::metric::v1::MetricType::GAUGE);
+    metric->set_name(this->name);
+    metric->set_service_name(this->service_name);
+    metric->set_description(this->description);
+    metric->set_timestamp(this->timestamp);
+    auto labels_ = metric->mutable_labels();
+    for (auto label : this->labels) {
+      labels_->insert({label.first, label.second});
+    }
+  }
 };
 
 } // namespace metric

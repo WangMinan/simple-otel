@@ -25,5 +25,7 @@ int main(int argc, char const *argv[]) {
   sleep(3);
   span1->SetStatus(trace::StatusCode::kOk);
   span1->End();
+  auto a = "";
+  auto b = "";
   return 0;
 }

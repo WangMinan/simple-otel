@@ -6,6 +6,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace metric {
 
@@ -25,7 +26,8 @@ void MetricsCollector::start() {
       std::this_thread::sleep_for(std::chrono::seconds(this->intervalSeconds));
       CpuMetricRecord cpuUsage = this->collectCpuUsage();
       MemoryMetricRecord memory = this->collectMemoryUsage();
-      exporter->Export({&cpuUsage, &memory});
+      std::vector<MetricRecord *> records = {&cpuUsage, &memory};
+      exporter->Export(records);
     }
   });
   collectingThread.detach();

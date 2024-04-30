@@ -1,7 +1,6 @@
 
 
 #include "metric_exporter.h"
-#include <initializer_list>
 #include <iostream>
 
 #ifndef METRIC_OSTREAM_EXPORTER_H
@@ -15,7 +14,7 @@ private:
 public:
   OstreamMetricExporter(std::ostream &sout_ = std::cout) : sout(sout_){};
   ~OstreamMetricExporter() = default;
-  void Export(std::initializer_list<MetricRecord*> records) override;
+  void Export(std::vector<MetricRecord*> &records) override;
 };
 
 } // namespace metric

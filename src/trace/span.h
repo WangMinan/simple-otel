@@ -1,6 +1,7 @@
 #include "processor/span_processor.h"
 #include "span_metadata.h"
 #include "trace_context.h"
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -32,7 +33,8 @@ protected:
 
 public:
   Span(std::string name, std::string service_name, std::string trace_id,
-       std::string parent_id, std::shared_ptr<TraceContext> trace_context_);
+       std::string parent_id, std::shared_ptr<TraceContext> trace_context_,
+       std::initializer_list<std::pair<std::string, std::string>> tags_);
   ~Span();
   void SetTag(std::string key, std::string value);
   void End();
@@ -70,16 +72,9 @@ struct SpanRecord {
 
 inline SpanRecord SpanToRecord(Span &span) {
   SpanRecord record = {
-    span.GetId(),
-    span.GetName(),
-    span.GetServiceName(),
-    span.GetTraceId(),
-    span.GetParentId(),
-    span.GetStartTime(),
-    span.GetEndTime(),
-    span.GetTags(),
-    span.GetStatus()
-  };
+      span.GetId(),      span.GetName(),     span.GetServiceName(),
+      span.GetTraceId(), span.GetParentId(), span.GetStartTime(),
+      span.GetEndTime(), span.GetTags(),     span.GetStatus()};
   return record;
 }
 

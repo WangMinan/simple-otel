@@ -6,8 +6,8 @@
 
 namespace trace {
 Span::Span(std::string name, std::string service_name, std::string trace_id,
-           std::string parent_id,
-           std::shared_ptr<TraceContext> trace_context_) {
+           std::string parent_id, std::shared_ptr<TraceContext> trace_context_,
+           std::initializer_list<std::pair<std::string, std::string>> tags_) {
   this->name = name;
   this->service_name = service_name;
   this->trace_id = trace_id;
@@ -17,6 +17,10 @@ Span::Span(std::string name, std::string service_name, std::string trace_id,
   this->end_time = 0;
   this->status = StatusCode::kUnset;
   this->trace_context = trace_context_;
+  for (auto [key, value] : tags_) {
+    this->tags[key] = value;
+  }
+
   this->trace_context->Processor()->OnStart(*this);
 }
 

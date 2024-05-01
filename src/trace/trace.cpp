@@ -1,12 +1,16 @@
 #include "trace.h"
 #include "span_context.h"
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 namespace trace {
 
-std::shared_ptr<Span> Trace::StartSpan(std::string name) {
+std::shared_ptr<Span> Trace::StartSpan(
+    std::string name,
+    std::initializer_list<std::pair<std::string, std::string>> tags_) {
 
   // 获取当前span的上下文，它将成为新span的父span
   SpanContext &parent_context = Context::GetCurrentContext();
@@ -32,7 +36,7 @@ std::shared_ptr<Span> Trace::StartSpan(std::string name) {
     }
   }
   auto span = std::make_shared<Span>(name, this->service_name, this->trace_id,
-                                     parent_id, this->context);
+                                     parent_id, this->context, tags_);
   Context::Attach(span->GetTraceId(), span->GetId(), attributes,
                   result.GetTraceFlag(),
                   this->context->GetSampler().GetSampleStrategy());

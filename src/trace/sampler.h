@@ -13,6 +13,7 @@ enum class SampleStrategy {
   kRandomSample = 1,
   kTailSample = 2,
   kHeadVariantSample = 3,
+  kNeverSample = 4,
 };
 
 class SampleResult {

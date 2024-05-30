@@ -70,8 +70,10 @@ MemoryMetricRecord MetricsCollector::collectMemoryUsage() {
     else if (line.find("MemAvailable:") == 0)
       sscanf(line.c_str(), "%*s%lu", &availableMemory);
   }
+  uint64_t usedMemory = totalMemory - availableMemory;
+
   return MemoryMetricRecord("memory", this->service_name, "memory usage",
-                            utils::TimestampGenerator::Now(), availableMemory,
+                            utils::TimestampGenerator::Now(), usedMemory,
                             availableMemory, totalMemory);
 }
 } // namespace metric

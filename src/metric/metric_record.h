@@ -107,11 +107,10 @@ public:
 
   void
   GetProtoMetric(arktouros::proto::collector::v1::Metric *new_metric) override {
-    auto histogram = new_metric->mutable_histogram();
-    histogram->set_sample_sum(this->memory_total);
-    histogram->set_sample_count(this->memory_usage);
+    auto guage = new_metric->mutable_gauge();
+    guage->set_value(this->memory_usage);
 
-    auto metric = histogram->mutable_metric();
+    auto metric = guage->mutable_metric();
     metric->set_metric_type(arktouros::proto::metric::v1::MetricType::GAUGE);
     metric->set_name(this->name);
     metric->set_service_name(this->service_name);

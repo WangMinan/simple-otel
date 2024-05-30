@@ -20,6 +20,7 @@ GrpcMetricClient::Export(std::vector<MetricRecord *> &records) {
   for (auto record : records) {
     auto metric = req.add_metrics();
     record->GetProtoMetric(metric);
+    std::cout << metric->gauge().metric().metric_type() << std::endl;
   }
   grpc::ClientContext ctx;
   MetricResponse resp;

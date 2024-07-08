@@ -113,6 +113,7 @@ else
 fi
 
 # 部署本项目
+echo "Prepare simple-otel project"
 cd /usr/local || exit
 git clone https://github.com/ZephyrZenn/simple-otel.git
 cd simple-otel || exit
@@ -120,3 +121,5 @@ mkdir -p cmake/build
 cd cmake/build || exit
 cmake -DCMAKE_PREFIX_PATH="${LOCAL_GRPC}" ../..
 make -j "${CPU_CORE_NUM}"
+
+echo "Build simple-otel project successfully!"

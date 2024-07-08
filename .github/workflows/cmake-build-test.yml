@@ -1,0 +1,19 @@
+name: "build-test"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: run cmake build script
+        run: bash ./build-simple-otel.sh

@@ -13,6 +13,5 @@ namespace trace
         SpanRecord record = SpanToRecord(span);
         this->exporter->Export(record);
     }
-
     
 }

@@ -1,6 +1,4 @@
 #include "ostream_log_exporter.h"
-#include <fmt/core.h>
-#include <fmt/format.h>
 #include <iostream>
 
 namespace logger {

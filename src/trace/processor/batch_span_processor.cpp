@@ -2,6 +2,8 @@
 #include <mutex>
 
 namespace trace {
+
+// 批量导出
 void BatchSpanProcessor::OnStart(Span &span) {}
 
 void BatchSpanProcessor::OnEnd(Span &span) {

@@ -13,7 +13,6 @@ enum class SampleStrategy {
   kRandomSample = 1,
   kTailSample = 2,
   kHeadVariantSample = 3,
-  kNeverSample = 4,
 };
 
 class SampleResult {
@@ -38,6 +37,7 @@ public:
   virtual SampleResult ShouldSampled(SpanContext &context) = 0;
   virtual ~Sampler() = default;
   virtual std::unique_ptr<Sampler> Clone() = 0;
+  virtual std::string Serialize() = 0;
   virtual bool IsPostSampler() { return false; }
   virtual SampleStrategy GetSampleStrategy() = 0;
   virtual std::unordered_map<std::string, std::string> GetAttributes() = 0;

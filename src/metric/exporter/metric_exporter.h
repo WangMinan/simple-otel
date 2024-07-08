@@ -11,6 +11,7 @@ class MetricExporter {
 public:
   virtual ~MetricExporter() = default;
   virtual void Export(std::vector<MetricRecord*> &records) = 0;
+  virtual void Export(MetricRecord &records) = 0;
 };
 } // namespace metric
 

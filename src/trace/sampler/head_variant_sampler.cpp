@@ -2,12 +2,13 @@
 #include "sampler.h"
 #include <string>
 #include <unordered_map>
+#include <ctime>
 
 namespace trace {
 
 SampleResult HeadVariantSampler::ShouldSampled(SpanContext &context) {
-  if (context.IsValid() && (context.GetTraceFlag() == TraceFlag::kIsDiscarded ||
-                            context.GetTraceFlag() == TraceFlag::kIsSampled)) {
+  if (context.GetTraceFlag() == TraceFlag::kIsDiscarded ||
+      context.GetTraceFlag() == TraceFlag::kIsSampled) {
     return SampleResult(context.GetTraceFlag() == TraceFlag::kIsSampled,
                         SampleStrategy::kHeadVariantSample,
                         context.GetTraceFlag());
@@ -19,8 +20,6 @@ SampleResult HeadVariantSampler::ShouldSampled(SpanContext &context) {
                         res < rate ? TraceFlag::kIsSampled
                                    : TraceFlag::kIsDiscarded);
   }
-  auto &attributes = context.GetAttributes();
-  attributes["threshold"] = std::to_string(threshold - 1);
   return SampleResult(true, SampleStrategy::kHeadVariantSample,
                       TraceFlag::kIsWaiting);
 }
@@ -43,9 +42,13 @@ SampleResult HeadVariantSampler::PostSample(
                       TraceFlag::kIsDiscarded);
 }
 std::unique_ptr<Sampler> HeadVariantSampler::Clone() {
-  return std::make_unique<HeadVariantSampler>(this->threshold, this->rate);
+  return common::make_unique<HeadVariantSampler>(this->threshold, this->rate);
 }
 
+std::string HeadVariantSampler::Serialize() {
+  // TODO:
+  return "";
+}
 SampleStrategy HeadVariantSampler::GetSampleStrategy() {
   return SampleStrategy::kHeadVariantSample;
 }

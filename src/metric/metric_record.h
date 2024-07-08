@@ -1,6 +1,3 @@
-
-#include "collector/metric_service.pb.h"
-#include "model/metric.pb.h"
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -13,7 +10,7 @@ printLabels(std::unordered_map<std::string, std::string> &labels);
 
 namespace metric {
 class MetricRecord {
-protected:
+public:
   std::string name;
   std::string service_name;
   std::string description;
@@ -28,8 +25,6 @@ public:
         timestamp(timestamp_), labels(labels_){};
   ~MetricRecord() = default;
   virtual std::string PrintJson() = 0;
-  virtual void
-  GetProtoMetric(arktouros::proto::collector::v1::Metric *new_metric) = 0;
 };
 
 class CpuMetricRecord : public MetricRecord {
@@ -53,22 +48,6 @@ public:
         << "\n  \"labels\": " << printLabels(labels) << ","
         << "\n  \"cpu_usage\": " << cpu_usage << "\n}";
     return oss.str();
-  };
-
-  void
-  GetProtoMetric(arktouros::proto::collector::v1::Metric *new_metric) override {
-    auto gauge = new_metric->mutable_gauge();
-    gauge->set_value(this->cpu_usage);
-    auto metric = gauge->mutable_metric();
-    metric->set_metric_type(arktouros::proto::metric::v1::MetricType::GAUGE);
-    metric->set_name(this->name);
-    metric->set_service_name(this->service_name);
-    metric->set_description(this->description);
-    metric->set_timestamp(this->timestamp);
-    auto labels_ = metric->mutable_labels();
-    for (auto label : this->labels) {
-      labels_->insert({label.first, label.second});
-    }
   };
 };
 
@@ -104,23 +83,6 @@ public:
         << "\n}";
     return oss.str();
   };
-
-  void
-  GetProtoMetric(arktouros::proto::collector::v1::Metric *new_metric) override {
-    auto guage = new_metric->mutable_gauge();
-    guage->set_value(this->memory_usage);
-
-    auto metric = guage->mutable_metric();
-    metric->set_metric_type(arktouros::proto::metric::v1::MetricType::GAUGE);
-    metric->set_name(this->name);
-    metric->set_service_name(this->service_name);
-    metric->set_description(this->description);
-    metric->set_timestamp(this->timestamp);
-    auto labels_ = metric->mutable_labels();
-    for (auto label : this->labels) {
-      labels_->insert({label.first, label.second});
-    }
-  }
 };
 
 } // namespace metric

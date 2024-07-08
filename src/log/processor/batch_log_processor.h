@@ -4,6 +4,7 @@
 #include "log_record.h"
 #include "period_task.h"
 #include "processor/log_processor.h"
+#include "unique_ptr.h"
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -24,7 +25,7 @@ public:
       this->exporter->Export(this->log_records);
       this->log_records.clear();
     };
-    back_task = std::make_unique<PeriodTask>(task, 1);
+    back_task = common::make_unique<PeriodTask>(task, 1);
   };
   ~BatchLogProcessor();
   void Process(LogRecord &log) override;

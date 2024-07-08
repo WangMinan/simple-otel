@@ -1,5 +1,3 @@
-
-
 #include "metric_exporter.h"
 #include <iostream>
 

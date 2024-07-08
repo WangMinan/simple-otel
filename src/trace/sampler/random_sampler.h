@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string>
 #include <unordered_map>
+#include <ctime>
 
 #ifndef TRACE_RANDOM_SAMPLER_H
 #define TRACE_RANDOM_SAMPLER_H
@@ -20,9 +21,12 @@ public:
   SampleResult ShouldSampled(SpanContext &context) override;
   ~RandomSampler() = default;
   std::unique_ptr<Sampler> Clone() override {
-    return std::make_unique<RandomSampler>(rate);
+    return common::make_unique<RandomSampler>(rate);
   };
-  
+  // TODO: Serialize
+  std::string Serialize() override {
+    return std::to_string(static_cast<int>(SampleStrategy::kRandomSample));
+  }
   SampleStrategy GetSampleStrategy() override;
   std::unordered_map<std::string, std::string> GetAttributes() override;
 };

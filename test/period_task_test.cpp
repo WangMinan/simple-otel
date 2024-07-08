@@ -1,4 +1,3 @@
-
 #include "exporter/ostream_span_exporter.h"
 #include "processor/batch_span_processor.h"
 #include "span_metadata.h"
@@ -6,12 +5,10 @@
 #include <memory>
 #include <unistd.h>
 
-using std::make_unique;
-
 void initTrace() {
-  auto exporter = std::make_unique<trace::OstreamSpanExporter>();
+  auto exporter = common::make_unique<trace::OstreamSpanExporter>();
   auto processor =
-      make_unique<trace::BatchSpanProcessor>(std::move(exporter), .10);
+      common::make_unique<trace::BatchSpanProcessor>(std::move(exporter), .10);
   trace::TraceProvider::InitProvider(std::move(processor), "logger_test");
 }
 
@@ -25,7 +22,5 @@ int main(int argc, char const *argv[]) {
   sleep(3);
   span1->SetStatus(trace::StatusCode::kOk);
   span1->End();
-  auto a = "";
-  auto b = "";
   return 0;
 }

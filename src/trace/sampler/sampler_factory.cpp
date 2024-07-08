@@ -14,26 +14,27 @@ std::unique_ptr<Sampler> trace::SamplerFactory::Create(
     std::unordered_map<std::string, std::string> args) {
   switch (strategy) {
   case SampleStrategy::kAlwaysSample:
-    return std::make_unique<AlwaysOnSampler>();
+    return common::make_unique<AlwaysOnSampler>();
   case SampleStrategy::kRandomSample: {
     int rate = std::atoi(args["rate"].c_str());
-    return std::make_unique<RandomSampler>(rate);
+    return common::make_unique<RandomSampler>(rate);
   }
   case SampleStrategy::kTailSample: {
     int rate = std::atoi(args["rate"].c_str());
-    return std::make_unique<TailSampler>(rate);
+    return common::make_unique<TailSampler>(rate);
   }
   case SampleStrategy::kHeadVariantSample: {
     int rate = std::atoi(args["rate"].c_str());
     int threshold = std::atoi(args["threshold"].c_str());
-    return std::make_unique<HeadVariantSampler>(threshold, rate);
+    return common::make_unique<HeadVariantSampler>(threshold, rate);
   }
   default:
-    return std::make_unique<AlwaysOnSampler>();
+    return common::make_unique<AlwaysOnSampler>();
   }
 }
 std::unique_ptr<Sampler> SamplerFactory::CreateFromParent() {
-  SpanContext &ctx = Context::GetParentContext();
+  //修改Context
+  SpanContext &ctx = ServerContext::GetParentContext();
   if (!ctx.IsValid()) {
     return nullptr;
   }

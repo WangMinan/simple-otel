@@ -1,6 +1,9 @@
 #include "exporter/ostream_span_exporter.h"
+#include "exporter/file_span_exporter.h"
+#include "exporter/tcp_span_exporter.h"
 #include "processor/post_sample_processor.h"
-#include "protocol/message.h"
+#include "tcp_exporter.h"
+#include "../protocol/message.h"
 #include "sampler/tail_sampler.h"
 #include "span_context.h"
 #include "span_metadata.h"
@@ -13,7 +16,12 @@
 #include <unistd.h>
 #include <utility>
 
-void initTrace();
+void initTrace() {
+  auto exporter = common::make_unique<trace::TCPSpanExporter>();
+  auto processor =
+      common::make_unique<trace::SimpleSpanProcessor>(std::move(exporter));
+  trace::TraceProvider::InitProvider(std::move(processor), "client_log");
+}
 
 void initPostTrace() {
   auto exporter = common::make_unique<trace::OstreamSpanExporter>();
@@ -25,7 +33,10 @@ void initPostTrace() {
 }
 
 int main() {
+  std::string ip = "8.149.132.190";
+  int port = 8088;
   initTrace();
+  common::TCPExporter tcp_exporter(ip,port);
   // creating socket
   int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -38,11 +49,11 @@ int main() {
   // sending connection request
   connect(clientSocket, (struct sockaddr *)&serverAddress,
           sizeof(serverAddress));
-  
+
   // sending data
   protocol::Message msg;
   auto trace = trace::TraceProvider::GetTrace();
-  // trace::SpanContext context;
+  trace::SpanContext context;
   auto span = trace->StartSpan("client");
   //修改Context
   trace::ServerContext::WriteToMessage(msg);
@@ -58,16 +69,9 @@ int main() {
   // trace::Context::AddRespContext(resp_context);
   span->SetStatus(trace::StatusCode::kOk);
   span->End();
+  sleep(1);
   // closing socket
   close(clientSocket);
 
   return 0;
-}
-
-void initTrace() {
-  auto exporter = common::make_unique<trace::OstreamSpanExporter>();
-  auto processor =
-      common::make_unique<trace::SimpleSpanProcessor>(std::move(exporter));
-
-  trace::TraceProvider::InitProvider(std::move(processor), "client");
 }

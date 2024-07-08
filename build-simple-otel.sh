@@ -4,7 +4,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
   echo "Usage: build-simple-otel.sh [OPTION*] [ARGV*], all options are optional"
   echo "Options:"
   echo "  --help, -h            Display help"
-  echo "  --no-fmt              Do not install fmt library, default true"
+  echo "  --no-fmt              Do not install fmt library, default false"
   echo "  --fmt-version         Specify fmt version, default 11.0.1"
   echo "  --no-grpc             Do not install grpc library, default false"
   echo "  --local-grpc          Use local grpc library, specify the path of grpc library"
@@ -13,7 +13,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
 fi
 
 # 设置变量
-NO_FMT=true
+NO_FMT=false
 FMT_VERSION="11.0.1"
 NO_GRPC=false
 LOCAL_GRPC="/usr/local/grpc-install"
@@ -70,7 +70,7 @@ fi
 if [ -f /usr/bin/fmt ] && [ "$NO_FMT" == "false" ]; then
   # 通过fmt --version的首行输出获取版本号
   FMT_VERSION_INSTALLED=$(fmt --version | head -n 1 | awk '{print $4}')
-  echo "fmt library already exists, version ${FMT_VERSION_INSTALLED}, do you want to reinstall it? [Y/n]"
+  echo "fmt library already exists, version ${FMT_VERSION_INSTALLED}, do you want to install another version? [Y/n]"
   read -r REINSTALL
   if [ "$REINSTALL" == "n" ]; then
     NO_FMT="true"
@@ -115,7 +115,7 @@ fi
 # 部署本项目
 echo "Prepare simple-otel project"
 cd /usr/local || exit
-git clone https://github.com/ZephyrZenn/simple-otel.git
+git clone https://github.com/wangminan/simple-otel.git
 cd simple-otel || exit
 mkdir -p cmake/build
 cd cmake/build || exit

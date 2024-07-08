@@ -2,9 +2,9 @@
 #include "span.h"
 #include "span_context.h"
 #include "timestamp_generator.h"
-#include <fmt/format.h>
 #include <iostream>
 #include <string>
+#include <sstream>
 
 namespace logger {
 
@@ -16,17 +16,17 @@ void Logger::EmitLog(
   LogRecord log = LogRecord(service_name, trace_id, span_id, content,
                             level == LogLevel::ERROR,
                             utils::TimestampGenerator::Now(), level, tags);
-  std::string msg =
-      fmt::format("[{}] service: {} trace_id: {} span_id: {} content: {}",
-                  printLogLevel(log.GetLogLevel()), log.GetServiceName(),
-                  log.GetTraceId(), log.GetSpanId(), log.GetContent());
-  std::cout << msg << std::endl;
+  std::ostringstream oss;
+  oss << "[" << log.GetLogLevel() << "]" << log.GetTimestamp() << " " << log.GetServiceName() << " " << log.GetContent() << std::endl;
+
+  std::cout << oss.str()<< std::endl;
   processor->Process(log);
 }
 
+//修改Context
 void Logger::EmitLog(std::string content, LogLevel level) {
 
-  trace::SpanContext &current_context = trace::Context::GetCurrentContext();
+  trace::SpanContext &current_context = trace::ServerContext::GetCurrentContext();
   std::string trace_id, span_id, service_name = this->service_name;
   if (current_context.IsValid()) {
     trace_id = current_context.GetTraceId();

@@ -4,6 +4,9 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <memory>
+#include <string>
+#include <sstream>
 
 #ifndef LOG_RECORD_H
 #define LOG_RECORD_H
@@ -70,6 +73,50 @@ inline std::string printTags(std::unordered_map<std::string, std::string> &tags)
 
 inline std::string printError(bool error) {
   return error ? "true" : "false";
+}
+
+inline std::string EscapeJsonString(const std::string &input) {
+    std::ostringstream ss;
+    for (char c : input) {
+        switch (c) {
+            case '"': ss << "\\\""; break;
+            case '\\': ss << "\\\\"; break;
+            case '\b': ss << "\\b"; break;
+            case '\f': ss << "\\f"; break;
+            case '\n': ss << "\\n"; break;
+            case '\r': ss << "\\r"; break;
+            case '\t': ss << "\\t"; break;
+            default: ss << c; break;
+        }
+    }
+    return ss.str();
+}
+
+inline std::string Serialize(LogRecord &record) {
+  std::ostringstream oss;
+    oss << "{";
+    oss << "\"service_name\":\"" << EscapeJsonString(record.GetServiceName()) << "\",";
+    oss << "\"trace_id\":\"" << EscapeJsonString(record.GetTraceId()) << "\",";
+    oss << "\"span_id\":\"" << EscapeJsonString(record.GetSpanId()) << "\",";
+    oss << "\"content\":\"" << EscapeJsonString(record.GetContent()) << "\",";
+    oss << "\"error\":" << printError(record.GetError()) << ",";
+    oss << "\"timestamp\":" << record.GetTimestamp() << ",";
+    oss << "\"tags\":{";
+
+    bool first = true;
+    for (const auto &tag : record.GetTags()) {
+        if (!first) {
+            oss << ",";
+        }
+        oss << "\"" << EscapeJsonString(tag.first) << "\":\"" << EscapeJsonString(tag.second) << "\"";
+        first = false;
+    }
+
+    oss << "},";
+    oss << "\"status\":\"" << printLogLevel(record.GetLogLevel()) << "\"";
+    oss << "}";
+    
+    return oss.str();
 }
 
 } // namespace logger

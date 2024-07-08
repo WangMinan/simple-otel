@@ -3,7 +3,6 @@
 
 namespace trace
 {
-
     enum class StatusCode
     {
         // default

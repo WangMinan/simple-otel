@@ -12,6 +12,7 @@ private:
   std::unique_ptr<Sampler> sampler;
 
 public:
+  // 设置前置和后置处理器，以及采样策略
   TraceContext(std::shared_ptr<SpanProcessor> processor_,
                std::unique_ptr<Sampler> &&sampler_)
       : processor(processor_), sampler(std::move(sampler_)){};

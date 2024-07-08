@@ -1,6 +1,7 @@
 #include "period_task.h"
 #include "span.h"
 #include "span_processor.h"
+#include "unique_ptr.h"
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -27,7 +28,7 @@ public:
       this->exporter->Export(this->span_records);
       this->span_records.clear();
     };
-    back_task = std::make_unique<PeriodTask>(task, 1);
+    back_task = common::make_unique<PeriodTask>(task, 1);
   };
   ~BatchSpanProcessor();
   void OnStart(Span &span) override;

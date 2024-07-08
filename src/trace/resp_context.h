@@ -6,6 +6,7 @@
 
 #ifndef TRACE_RESP_CONTEXT_H
 #define TRACE_RESP_CONTEXT_H
+
 namespace trace {
 /// @brief return context to the invoker for post processing
 class RespContext {

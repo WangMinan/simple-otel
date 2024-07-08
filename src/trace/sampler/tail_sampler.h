@@ -2,6 +2,7 @@
 #include "span_context.h"
 #include "trace_metadata.h"
 #include <cstdlib>
+#include <ctime>
 
 #ifndef TRACE_TAIL_SAMPLER_H
 #define TRACE_TAIL_SAMPLER_H
@@ -29,7 +30,7 @@ public:
     TraceFlag trace_flag;
     // 链路尾部，开启概率采样
     if (resp_contexts.empty()) {
-
+      
       srand(time(NULL));
       int res = rand() % 100;
       return SampleResult(res < rate, SampleStrategy::kTailSample,
@@ -52,10 +53,13 @@ public:
   }
 
   std::unique_ptr<Sampler> Clone() override {
-    return std::make_unique<TailSampler>(this->rate);
+    return common::make_unique<TailSampler>(this->rate);
   }
 
-  
+  // TODO: Serialize
+  std::string Serialize() override {
+    return std::to_string(static_cast<int>(SampleStrategy::kTailSample));
+  }
 
   SampleStrategy GetSampleStrategy() override {
     return SampleStrategy::kTailSample;

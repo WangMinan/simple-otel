@@ -11,6 +11,7 @@ class Logger {
 private:
   std::shared_ptr<LogProcessor> processor;
   std::string service_name;
+  std::string function_name;
 
 protected:
   void
@@ -20,8 +21,8 @@ protected:
   void EmitLog(std::string content, LogLevel level);
 
 public:
-  Logger(std::shared_ptr<LogProcessor> processor_, std::string service_name_)
-      : processor(processor_), service_name(service_name_){};
+  Logger(std::shared_ptr<LogProcessor> processor_, std::string service_name_, std::string function_name_)
+      : processor(processor_), service_name(service_name_), function_name(function_name_){};
   ~Logger() = default;
   void Debug(std::string content);
   void Info(std::string content);

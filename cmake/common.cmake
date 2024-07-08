@@ -70,13 +70,13 @@ elseif(GRPC_FETCHCONTENT)
   message(STATUS "Using gRPC via add_subdirectory (FetchContent).")
   include(FetchContent)
   FetchContent_Declare(
-    grpc
-    GIT_REPOSITORY https://github.com/grpc/grpc.git
-    # when using gRPC, you will actually set this to an existing tag, such as
-    # v1.25.0, v1.26.0 etc..
-    # For the purpose of testing, we override the tag used to the commit
-    # that's currently under test.
-    GIT_TAG        vGRPC_TAG_VERSION_OF_YOUR_CHOICE)
+          grpc
+          GIT_REPOSITORY https://github.com/grpc/grpc.git
+          # when using gRPC, you will actually set this to an existing tag, such as
+          # v1.25.0, v1.26.0 etc..
+          # For the purpose of testing, we override the tag used to the commit
+          # that's currently under test.
+          GIT_TAG        vGRPC_TAG_VERSION_OF_YOUR_CHOICE)
   FetchContent_MakeAvailable(grpc)
 
   # Since FetchContent uses add_subdirectory under the hood, we can use

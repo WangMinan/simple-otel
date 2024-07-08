@@ -7,7 +7,7 @@ namespace logger {
 class LogExporter {
 public:
   LogExporter() = default;
-  ~LogExporter() = default;
+  virtual ~LogExporter() = default;
   virtual void Export(LogRecord &log) = 0;
   virtual void Export(std::vector<LogRecord> &records) = 0;
 };

@@ -6,4 +6,4 @@
 
 arktouros主仓库托管地址: [https://github.com/wangminan/arktouros](https://github.com/wangminan/arktouros)
 
-构建脚本指南请见[how-to-build.sh](./build-simple-otel.sh)
+构建脚本指南请见[build-simple-otel.sh](./build-simple-otel.sh)

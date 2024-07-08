@@ -60,7 +60,7 @@ if [ -f /etc/redhat-release ]; then
     # 项目环境为WSL下的Almalinux 9 请根据实际情况修改
     yum -y install gcc g++ cmake automake autoconf boost-devel libtool wget git
 elif [ -f /etc/lsb-release ]; then
-    apt-get install -y git gcc g++ make cmake build-essential autoconf libtool pkg-config libboost-all-dev
+    sudo apt-get install -y git gcc g++ make cmake build-essential autoconf libtool pkg-config libboost-all-dev
 else
   echo "Unknown linux distribution. Exiting..."
   exit 1
